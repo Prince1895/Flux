@@ -1,6 +1,6 @@
-#Flux - Cut the Bloat, Keep the Scale.
+# Flux - Cut the Bloat, Keep the Scale.
 
-#Database design
+# Database design
 ![alt text](image.png)
 
 
