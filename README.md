@@ -1,3 +1,36 @@
+#Flux - Cut the Bloat, Keep the Scale.
+
+#Database design
+![alt text](image.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Turborepo starter
 
 This Turborepo starter is maintained by the Turborepo core team.
