@@ -1,24 +1,25 @@
 const express = require('express');
 const cors = require('cors');
-const supabase = require('./config/supabaseClient');
+const supabase = require('./config/supabaseClient'); // Updated path
 const authRoutes = require('./routes/authRoutes');
-
+const { verifyJWT } = require('./middlewares/authMiddleware.js');
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-// app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes);
+
 app.get('/health', (req, res) => {
   res.json({ status: 'flux API running' });
 });
 
-
-app.get('/api/accounts', async (req, res) => {
+app.get('/api/accounts', verifyJWT, async (req, res) => {
   const { data, error } = await supabase
     .from('cloud_accounts')
-    .select('*');
+    .select('*')
+    .eq('tenant_id', req.user.app_metadata.tenant_id);
 
   if (error) return res.status(400).json({ error: error.message });
   res.json(data);

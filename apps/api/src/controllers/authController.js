@@ -1,4 +1,4 @@
-const supabase = require('./config/supabaseClient');
+const supabase = require('../config/supabaseClient');
 
 exports.signup = async(req,res)=>{
     const{email,password,company_name}=req.body;
