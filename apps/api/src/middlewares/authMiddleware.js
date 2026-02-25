@@ -2,7 +2,7 @@ const supabase = require('../config/supabaseClient');
 
 const verifyJWT = async (req, res, next) => {
     const authHeader = req.headers.authorization; // Note the 's' in headers
-    
+
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
         return res.status(401).json({ error: "Unauthorized access" });
     }

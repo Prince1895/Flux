@@ -21,7 +21,7 @@ app.get('/api/accounts', verifyJWT, async (req, res) => {
   const { data, error } = await supabase
     .from('cloud_accounts')
     .select('*')
-    .eq('tenant_id', req.user.app_metadata.tenant_id);
+    .eq('tenant_id', req.user.user_metadata.tenant_id);
 
   if (error) return res.status(400).json({ error: error.message });
   res.json(data);

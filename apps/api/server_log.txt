@@ -1,0 +1,13 @@
+
+> api@1.0.0 dev
+> NODE_OPTIONS='--dns-result-order=ipv4first' nodemon src/server.js
+
+[33m[nodemon] 3.1.11[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): *.*[39m
+[33m[nodemon] watching extensions: js,mjs,cjs,json[39m
+[32m[nodemon] starting `node src/server.js`[39m
+[dotenv@17.3.1] injecting env (3) from .env -- tip: ⚙️  override existing env vars with { override: true }
+[dotenv@17.3.1] injecting env (0) from .env -- tip: 🛡️ auth for agents: https://vestauth.com
+🟢 flux API running on port 4000
+[32m[nodemon] clean exit - waiting for changes before restart[39m
