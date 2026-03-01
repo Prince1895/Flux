@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import Connect from './pages/Connect';
 import Login from './pages/Login';
+import Signup from './pages/Signup';
 import './styles/globals.css';
 
 // Protected Route Wrapper
@@ -20,6 +21,7 @@ const AppRouter = () => {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
       <Route
         path="/dashboard"
         element={
