@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { Mail, Lock, Github } from 'lucide-react';
+import { Activity, Mail, Lock, Github } from 'lucide-react';
 import '../styles/landing.css';
 
 const GoogleIcon = () => (
@@ -13,18 +13,7 @@ const GoogleIcon = () => (
     </svg>
 );
 
-const FluxTriangle = () => (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 3L3 20h18L12 3z" stroke="#00d65b" strokeWidth="2" strokeLinejoin="round" fill="#00d65b" fillOpacity="0.2" />
-        <path d="M12 3L3 20h18L12 3z" fill="url(#fluxGrad)" />
-        <defs>
-            <linearGradient id="fluxGrad" x1="12" y1="3" x2="12" y2="20" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#10b981" />
-                <stop offset="1" stopColor="#047857" />
-            </linearGradient>
-        </defs>
-    </svg>
-);
+
 
 const Login = () => {
     const { login } = useAuth();
@@ -52,11 +41,11 @@ const Login = () => {
     return (
         <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#ffffff', fontFamily: '"Inter", sans-serif' }}>
             {/* Left Side: Form */}
-            <div style={{ flex: '0 0 500px', width: '100%', maxWidth: '100%', display: 'flex', flexDirection: 'column', backgroundColor: '#ffffff', borderRight: '1px solid #f3f4f6', zIndex: 10 }}>
+            <div style={{ flex: '0 0 700px', width: '100%', maxWidth: '100%', display: 'flex', flexDirection: 'column', backgroundColor: '#ffffff', borderRight: '1px solid #f3f4f6', zIndex: 10 }}>
                 <div style={{ padding: '3rem', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
                     {/* Logo */}
                     <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.6rem', fontWeight: 800, fontSize: '1.25rem', color: '#111827', marginBottom: 'auto', textDecoration: 'none' }}>
-                        <FluxTriangle />
+                        <Activity color="var(--brand-green, #10b981)" size={24} />
                         Flux
                     </Link>
 
@@ -134,7 +123,7 @@ const Login = () => {
                         </div>
 
                         <div style={{ textAlign: 'center', marginTop: '2.5rem', fontSize: '0.9rem', color: '#6b7280' }}>
-                            Not a member yet? <a href="#" style={{ color: '#00d65b', fontWeight: 600, textDecoration: 'none' }}>Start a 14 day free trial</a>
+                            Not a member yet? <Link to="/signup" style={{ color: '#00d65b', fontWeight: 600, textDecoration: 'none' }}>Start a 14 day free trial</Link>
                         </div>
 
                     </div>

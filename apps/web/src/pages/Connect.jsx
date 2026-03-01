@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
-import { ArrowLeft, CheckCircle, Copy, Terminal } from 'lucide-react';
+import { Activity, ArrowLeft, CheckCircle, Copy, Terminal } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Connect = () => {
