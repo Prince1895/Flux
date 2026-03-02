@@ -53,7 +53,7 @@ const Home = () => {
                 </div>
                 <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
                     <Link to="/login" className="landing-btn-login">Login</Link>
-                    <Link to="/login" className="landing-btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem' }}>Get Started</Link>
+                    <Link to="/signup" className="landing-btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem' }}>Get Started</Link>
                 </div>
             </nav>
 
@@ -64,7 +64,7 @@ const Home = () => {
                         <Activity size={12} /> NEW: REAPER ENGINE 1.0
                     </div>
                     <h1 className="hero-title">
-                        Optimize Your <br /><span className="text-brand">Cloud Storage</span><br /> with Flux
+                        Optimize Your <br /><span className="text-brand">Cloud</span><br /> with Flux
                     </h1>
                     <p className="hero-subtitle">
                         The enterprise-grade reaper engine that slashes storage costs by up to 60% through intelligent lifecycle management and automated data tiering.

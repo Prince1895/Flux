@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { Activity, Mail, Lock, Github } from 'lucide-react';
+import { apiClient } from '../lib/api';
 import '../styles/landing.css';
 
 const GoogleIcon = () => (
@@ -34,6 +35,18 @@ const Login = () => {
         } catch (err) {
             setError(err.message || 'Failed to authenticate');
         } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSocialLogin = async (provider) => {
+        setLoading(true);
+        setError('');
+        try {
+            const res = await apiClient.get(`/api/auth/${provider}?redirectTo=${window.location.origin}/dashboard`);
+            window.location.href = res.data.url;
+        } catch (err) {
+            setError(`Failed to authenticate with ${provider}`);
             setLoading(false);
         }
     };
@@ -114,10 +127,10 @@ const Login = () => {
                         </div>
 
                         <div style={{ display: 'flex', gap: '1rem' }}>
-                            <button className="auth-social-btn" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem', padding: '0.7rem', backgroundColor: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 600, color: '#374151', cursor: 'pointer', transition: 'background 0.2s' }}>
+                            <button type="button" onClick={() => handleSocialLogin('google')} disabled={loading} className="auth-social-btn" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem', padding: '0.7rem', backgroundColor: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 600, color: '#374151', cursor: 'pointer', transition: 'background 0.2s' }}>
                                 <GoogleIcon /> Google
                             </button>
-                            <button className="auth-social-btn" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem', padding: '0.7rem', backgroundColor: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 600, color: '#374151', cursor: 'pointer', transition: 'background 0.2s' }}>
+                            <button type="button" onClick={() => handleSocialLogin('github')} disabled={loading} className="auth-social-btn" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem', padding: '0.7rem', backgroundColor: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 600, color: '#374151', cursor: 'pointer', transition: 'background 0.2s' }}>
                                 <Github size={18} color="#111827" /> GitHub
                             </button>
                         </div>

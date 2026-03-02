@@ -27,3 +27,29 @@ exports.login = async (req, res) => {
         user: data.user
     })
 }
+
+exports.googleLogin = async (req, res) => {
+    const redirectTo = req.query.redirectTo || 'http://localhost:5173';
+    const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+            redirectTo: redirectTo,
+        },
+    });
+
+    if (error) return res.status(400).json({ error: error.message });
+    res.status(200).json({ url: data.url });
+}
+
+exports.githubLogin = async (req, res) => {
+    const redirectTo = req.query.redirectTo || 'http://localhost:5173';
+    const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'github',
+        options: {
+            redirectTo: redirectTo,
+        },
+    });
+
+    if (error) return res.status(400).json({ error: error.message });
+    res.status(200).json({ url: data.url });
+}
