@@ -24,9 +24,10 @@ const Dashboard = () => {
     const [reapedSavings, setReapedSavings] = useState(0);
 
     const fetchZombies = async () => {
+        if (!user?.user_metadata?.tenant_id) return;
         setLoading(true);
         try {
-            const data = await api.getAllZombies();
+            const data = await api.getAllZombies(user.user_metadata.tenant_id);
             // To match the mockup visually while loading real data, user might want fake mock data if db is empty.
             // But let's use the real data from DB, we just format it beautifully.
             setZombies(data);
@@ -55,8 +56,10 @@ const Dashboard = () => {
     };
 
     useEffect(() => {
-        fetchZombies();
-    }, []);
+        if (user?.user_metadata?.tenant_id) {
+            fetchZombies();
+        }
+    }, [user]);
 
     const handleReap = async (zombieId) => {
         setReapingId(zombieId);

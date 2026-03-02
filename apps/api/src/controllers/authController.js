@@ -53,3 +53,47 @@ exports.githubLogin = async (req, res) => {
     if (error) return res.status(400).json({ error: error.message });
     res.status(200).json({ url: data.url });
 }
+
+exports.syncProfile = async (req, res) => {
+    try {
+        const authHeader = req.headers.authorization;
+        if (!authHeader) return res.status(401).json({ error: 'No authorization header' });
+
+        const token = authHeader.split(' ')[1];
+        const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+
+        if (userError || !user) return res.status(401).json({ error: 'Invalid token' });
+
+        // Check if user already exists in public.users
+        const { data: existingUser } = await supabase.from('users').select('*').eq('id', user.id).single();
+
+        if (existingUser && user.user_metadata?.tenant_id) {
+            return res.status(200).json({ message: 'Profile already synced' });
+        }
+
+        // Create a default tenant if they don't have one
+        const tenantName = user.user_metadata?.full_name ? `${user.user_metadata.full_name}'s Workspace` : 'Default Workspace';
+        const { data: tenant, error: tenantError } = await supabase.from('tenants').insert([{ name: tenantName }]).select().single();
+        if (tenantError) throw tenantError;
+
+        // Insert into public.users
+        const { error: insertUserError } = await supabase.from('users').upsert([{
+            id: user.id,
+            email: user.email,
+            tenant_id: tenant.id,
+            role: 'admin'
+        }]);
+        if (insertUserError) throw insertUserError;
+
+        // Update auth metadata
+        const { error: updateError } = await supabase.auth.admin.updateUserById(user.id, {
+            user_metadata: { ...user.user_metadata, tenant_id: tenant.id, role: 'admin' }
+        });
+        if (updateError) throw updateError;
+
+        res.status(200).json({ message: 'Profile synced successfully', tenant_id: tenant.id });
+    } catch (err) {
+        console.error('Sync profile error:', err);
+        res.status(500).json({ error: err.message });
+    }
+}

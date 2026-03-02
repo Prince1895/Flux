@@ -44,13 +44,19 @@ export const api = {
         const res = await apiClient.post(`/api/reap/${zombieId}`);
         return res.data;
     },
-    getAllZombies: async () => {
+    getAllZombies: async (tenantId) => {
         // This connects directly to Supabase from the frontend to fetch the user's zombies.
-        // Ensure the RLS logic on zombie_resources is robust!
-        const { data, error } = await supabase
+        // We filter by tenant_id to isolate data properly.
+        let query = supabase
             .from('zombie_resources')
             .select('*, cloud_accounts(account_alias)')
             .order('detected_at', { ascending: false });
+
+        if (tenantId) {
+            query = query.eq('tenant_id', tenantId);
+        }
+
+        const { data, error } = await query;
 
         if (error) throw error;
         return data;
