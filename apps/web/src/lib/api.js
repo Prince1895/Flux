@@ -45,11 +45,24 @@ export const api = {
         return res.data;
     },
     getAllZombies: async () => {
-        // This connects directly to Supabase from the frontend to fetch the user's zombies.
-        // Ensure the RLS logic on zombie_resources is robust!
+        // Step 1: Get the current authenticated user
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('Not authenticated');
+
+        // Step 2: Fetch the user's tenant_id from the users table
+        const { data: userData, error: userError } = await supabase
+            .from('users')
+            .select('tenant_id')
+            .eq('id', user.id)
+            .single();
+
+        if (userError) throw userError;
+
+        // Step 3: Fetch zombies scoped to this tenant only
         const { data, error } = await supabase
             .from('zombie_resources')
             .select('*, cloud_accounts(account_alias)')
+            .eq('tenant_id', userData.tenant_id)
             .order('detected_at', { ascending: false });
 
         if (error) throw error;

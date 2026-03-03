@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { api } from '../lib/api';
+import { supabase } from '../lib/supabaseClient';
 import { Link } from 'react-router-dom';
 import {
     Activity, LayoutDashboard, Cloud, Zap, BarChart2, Settings, Users,
@@ -17,6 +18,7 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
     const [reapingId, setReapingId] = useState(null);
     const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
+    const [tenantName, setTenantName] = useState('');
 
     // Stats
     const [totalZombies, setTotalZombies] = useState(0);
@@ -56,6 +58,27 @@ const Dashboard = () => {
 
     useEffect(() => {
         fetchZombies();
+        // Fetch the tenant/org name for the logged-in user
+        const fetchTenantName = async () => {
+            try {
+                const { data: { user: authUser } } = await supabase.auth.getUser();
+                if (!authUser) return;
+                const { data: userData } = await supabase
+                    .from('users')
+                    .select('tenant_id')
+                    .eq('id', authUser.id)
+                    .single();
+                if (userData?.tenant_id) {
+                    const { data: tenant } = await supabase
+                        .from('tenants')
+                        .select('name')
+                        .eq('id', userData.tenant_id)
+                        .single();
+                    if (tenant?.name) setTenantName(tenant.name);
+                }
+            } catch (_) { /* silently ignore */ }
+        };
+        fetchTenantName();
     }, []);
 
     const handleReap = async (zombieId) => {
@@ -128,7 +151,20 @@ const Dashboard = () => {
 
                 {/* Header */}
                 <header className="dash-header">
-                    <h1>Fleet Command</h1>
+                    <div>
+                        <h1 style={{ margin: 0, fontSize: '1.5rem' }}>
+                            {user?.user_metadata?.full_name
+                                ? `Hey, ${user.user_metadata.full_name.split(' ')[0]} 👋`
+                                : user?.email?.split('@')[0]
+                                    ? `Hey, ${user.email.split('@')[0]} 👋`
+                                    : 'Fleet Command'}
+                        </h1>
+                        {tenantName && (
+                            <p style={{ margin: '2px 0 0', fontSize: '0.82rem', color: '#6b7280', fontWeight: 400 }}>
+                                {tenantName}'s Fleet Command
+                            </p>
+                        )}
+                    </div>
                     <div className="dash-header-actions">
                         <button className="dash-icon-btn"><Sun size={20} /></button>
                         <button className="dash-icon-btn" style={{ position: 'relative' }}>

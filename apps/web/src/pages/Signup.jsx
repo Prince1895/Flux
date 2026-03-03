@@ -16,7 +16,7 @@ const GoogleIcon = () => (
 
 
 const Signup = () => {
-    // We would use useAuth's signup method if it were defined, but for now we'll simulate.
+    const { signup } = useAuth();
     const navigate = useNavigate();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -29,11 +29,14 @@ const Signup = () => {
         setLoading(true);
         setError('');
 
-        // Provide a simulated path / error if signup backend isn't ready
-        setTimeout(() => {
-            setLoading(false);
+        try {
+            await signup(email, password, name);
             navigate('/login');
-        }, 1000);
+        } catch (err) {
+            setError(err.message || 'Signup failed. Please try again.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
