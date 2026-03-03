@@ -107,9 +107,9 @@ const Dashboard = () => {
                     <a href="#" className="dash-nav-item active">
                         <LayoutDashboard size={18} /> Overview
                     </a>
-                    <a href="#" className="dash-nav-item">
+                    <Link to="/dashboard/accounts" className="dash-nav-item">
                         <Cloud size={18} /> Cloud Accounts
-                    </a>
+                    </Link>
                     <a href="#" className="dash-nav-item">
                         <Zap size={18} /> Automation
                     </a>

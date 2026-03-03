@@ -44,6 +44,10 @@ export const api = {
         const res = await apiClient.post(`/api/reap/${zombieId}`);
         return res.data;
     },
+    deleteAccount: async (accountId) => {
+        const res = await apiClient.delete(`/api/accounts/${accountId}`);
+        return res.data;
+    },
     getAllZombies: async () => {
         // Step 1: Get the current authenticated user
         const { data: { user } } = await supabase.auth.getUser();
