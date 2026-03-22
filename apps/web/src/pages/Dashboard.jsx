@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { api } from '../lib/api';
-import { supabase } from '../lib/supabaseClient';
 import { Link } from 'react-router-dom';
 import {
     Activity, LayoutDashboard, Cloud, Zap, BarChart2, Settings, Users,
@@ -58,27 +57,8 @@ const Dashboard = () => {
 
     useEffect(() => {
         fetchZombies();
-        // Fetch the tenant/org name for the logged-in user
-        const fetchTenantName = async () => {
-            try {
-                const { data: { user: authUser } } = await supabase.auth.getUser();
-                if (!authUser) return;
-                const { data: userData } = await supabase
-                    .from('users')
-                    .select('tenant_id')
-                    .eq('id', authUser.id)
-                    .single();
-                if (userData?.tenant_id) {
-                    const { data: tenant } = await supabase
-                        .from('tenants')
-                        .select('name')
-                        .eq('id', userData.tenant_id)
-                        .single();
-                    if (tenant?.name) setTenantName(tenant.name);
-                }
-            } catch (_) { /* silently ignore */ }
-        };
-        fetchTenantName();
+        // Read tenant name from the user object stored during login/signup
+        if (user?.company_name) setTenantName(user.company_name);
     }, []);
 
     const handleReap = async (zombieId) => {
@@ -287,7 +267,7 @@ const Dashboard = () => {
                                             <td className="text-secondary">{z.region}</td>
                                             <td>
                                                 <span className="account-badge">
-                                                    {z.cloud_accounts?.account_alias || 'Unknown'}
+                                                    {z.account_alias || 'Unknown'}
                                                 </span>
                                             </td>
                                             <td style={{ fontWeight: 600 }}>

@@ -1,52 +1,86 @@
 import { useState, useEffect, createContext, useContext } from 'react';
-import { supabase } from '../lib/supabaseClient';
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
 
 const AuthContext = createContext();
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+const TOKEN_KEY = 'auth_token';
+const USER_KEY = 'auth_user';
+
+const saveSession = (token, user) => {
+    localStorage.setItem(TOKEN_KEY, token);
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+};
+
+const clearSession = () => {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+};
+
+export const getStoredToken = () => localStorage.getItem(TOKEN_KEY);
+
+const getStoredUser = () => {
+    try {
+        const raw = localStorage.getItem(USER_KEY);
+        return raw ? JSON.parse(raw) : null;
+    } catch {
+        return null;
+    }
+};
+
+// ── Provider ──────────────────────────────────────────────────────────────────
+
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const [session, setSession] = useState(null);
     const [loading, setLoading] = useState(true);
 
+    // Restore session from localStorage on mount
     useEffect(() => {
-        // Check active sessions and sets the user
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setSession(session);
-            setUser(session?.user ?? null);
-            setLoading(false);
-        });
-
-        // Listen for changes on auth state
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setSession(session);
-            setUser(session?.user ?? null);
-            setLoading(false);
-        });
-
-        return () => subscription.unsubscribe();
+        const storedUser = getStoredUser();
+        const storedToken = getStoredToken();
+        if (storedUser && storedToken) {
+            setUser(storedUser);
+        }
+        setLoading(false);
     }, []);
 
     const signup = async (email, password, name) => {
-        const { data, error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-                data: { full_name: name },
-            },
+        const res = await fetch(`${API_BASE_URL}/api/auth/signup`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password, company_name: name }),
         });
-        if (error) throw error;
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Signup failed');
+
+        saveSession(data.token, data.user);
+        setUser(data.user);
         return data;
     };
 
     const login = async (email, password) => {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        const res = await fetch(`${API_BASE_URL}/api/auth/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Login failed');
+
+        saveSession(data.token, data.user);
+        setUser(data.user);
         return data;
     };
 
-    const logout = async () => {
-        await supabase.auth.signOut();
+    const logout = () => {
+        clearSession();
+        setUser(null);
     };
+
+    // session shape expected by existing components
+    const session = user ? { access_token: getStoredToken(), user } : null;
 
     return (
         <AuthContext.Provider value={{ user, session, loading, signup, login, logout }}>

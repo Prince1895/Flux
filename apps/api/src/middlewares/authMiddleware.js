@@ -1,18 +1,24 @@
-const supabase = require('../config/supabaseClient');
+const jwt = require('jsonwebtoken');
 
-const verifyJWT = async (req, res, next) => {
-    const authHeader = req.headers.authorization; // Note the 's' in headers
+const JWT_SECRET = process.env.JWT_SECRET;
+
+const verifyJWT = (req, res, next) => {
+    const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ error: "Unauthorized access" });
+        return res.status(401).json({ error: 'Unauthorized access' });
     }
+
     const token = authHeader.split(' ')[1];
-    const { data: { user }, error } = await supabase.auth.getUser(token);
-    if (error || !user) {
-        return res.status(401).json({ error: "Invalid Token" });
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        // Shape: { id, tenant_id, role }
+        req.user = decoded;
+        next();
+    } catch (err) {
+        return res.status(401).json({ error: 'Invalid or expired token' });
     }
-    req.user = user;
-    next();
 };
 
 module.exports = { verifyJWT };
