@@ -15,7 +15,9 @@ async function pushSchema() {
 
     // Parse the connection string to extract host and credentials
     // Format: postgresql://user:password@host/database?...
-    const url = new URL(connectionString);
+    // Remove -pooler from both the hostname and the connection string sent in the header
+    const cleanConnectionString = connectionString.replace('-pooler', '');
+    const url = new URL(cleanConnectionString);
     const host = url.hostname;           // e.g. ep-bold-haze-abc123.us-east-1.aws.neon.tech
     const username = decodeURIComponent(url.username);
     const password = decodeURIComponent(url.password);
@@ -44,7 +46,7 @@ async function pushSchema() {
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Basic ${Buffer.from(`${username}:${password}`).toString('base64')}`,
-                    'Neon-Connection-String': connectionString,
+                    'Neon-Connection-String': cleanConnectionString,
                 },
                 body: JSON.stringify({ query: stmt })
             });
