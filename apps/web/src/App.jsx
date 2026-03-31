@@ -6,6 +6,7 @@ import CloudAccounts from './pages/CloudAccounts';
 import Connect from './pages/Connect';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import Pricing from './pages/Pricing';
 import './styles/globals.css';
 
 // Protected Route Wrapper
@@ -36,6 +37,14 @@ const AppRouter = () => {
         element={
           <ProtectedRoute>
             <CloudAccounts />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard/pricing"
+        element={
+          <ProtectedRoute>
+            <Pricing />
           </ProtectedRoute>
         }
       />

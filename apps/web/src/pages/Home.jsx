@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Activity, Play, ArrowRight, Trash2, TrendingUp, LineChart, X, Network, BarChart3, SlidersHorizontal } from 'lucide-react';
+import { Activity, Play, ArrowRight, Trash2, TrendingUp, LineChart, X, Network, BarChart3, SlidersHorizontal, CheckCircle2, Zap } from 'lucide-react';
 import '../styles/landing.css';
 
 const Home = () => {
@@ -53,7 +53,7 @@ const Home = () => {
                 </div>
                 <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
                     <Link to="/login" className="landing-btn-login">Login</Link>
-                    <Link to="/login" className="landing-btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem' }}>Get Started</Link>
+                    <Link to="/signup" className="landing-btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.9rem' }}>Get Started</Link>
                 </div>
             </nav>
 
@@ -171,6 +171,212 @@ const Home = () => {
                 </div>
             </section>
 
+            {/* Pricing Section */}
+            <section id="pricing" className="features-section" style={{ paddingTop: '6rem', paddingBottom: '6rem', background: '#fafafa', color: '#111827' }}>
+                <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 2rem' }}>
+                    {/* Header Row */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '4rem', flexWrap: 'wrap', gap: '2rem' }}>
+                        <div style={{ maxWidth: '600px' }}>
+                            <span style={{ display: 'inline-block', background: '#d1fae5', color: '#059669', padding: '0.4rem 1rem', borderRadius: '30px', fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.05em', marginBottom: '1.25rem' }}>
+                                CRYSTALLINE EFFICIENCY
+                            </span>
+                            <h2 style={{ fontSize: '2.8rem', fontWeight: 800, marginBottom: '1rem', color: '#111827', lineHeight: 1.1 }}>
+                                Simple, Transparent <br />Pricing
+                            </h2>
+                            <p style={{ color: '#4b5563', fontSize: '1.1rem', lineHeight: 1.6 }}>
+                                Choose the plan that fits your infrastructure needs. No hidden fees, just pure optimization for your cloud storage reaper engine.
+                            </p>
+                        </div>
+
+                        {/* Pricing is monthly only */}
+                    </div>
+
+                    {/* Pricing Cards */}
+                    <div className="features-grid" style={{ marginBottom: '6rem' }}>
+
+                        {/* Starter */}
+                        <div className="pricing-card" style={{ background: '#f8fafc', borderRadius: '24px', padding: '3rem 2.5rem', display: 'flex', flexDirection: 'column' }}>
+                            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.5rem', color: '#111827' }}>Starter</h3>
+                            <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '0.5rem' }}>
+                                <span style={{ fontSize: '3.5rem', fontWeight: 800, color: '#111827' }}>$0</span>
+                                <span style={{ color: '#4b5563', marginLeft: '0.25rem', fontWeight: 500 }}>/mo</span>
+                            </div>
+                            <p style={{ color: '#6b7280', marginBottom: '2.5rem', fontSize: '0.95rem' }}>5 credits monthly for zero-cost cloud optimization.</p>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem', flexGrow: 1, marginBottom: '3rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.95rem', color: '#374151', fontWeight: 500 }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#d1fae5', borderRadius: '50%', width: '22px', height: '22px' }}>
+                                        <CheckCircle2 size={16} color="#059669" />
+                                    </div>
+                                    5 Free Scans / Month
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.95rem', color: '#374151', fontWeight: 500 }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#d1fae5', borderRadius: '50%', width: '22px', height: '22px' }}>
+                                        <CheckCircle2 size={16} color="#059669" />
+                                    </div>
+                                    Daily Reaper Scan
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.95rem', color: '#374151', fontWeight: 500 }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#d1fae5', borderRadius: '50%', width: '22px', height: '22px' }}>
+                                        <CheckCircle2 size={16} color="#059669" />
+                                    </div>
+                                    Community Support
+                                </div>
+                            </div>
+
+                            <Link to="/signup" style={{ display: 'block', textAlign: 'center', padding: '1rem', background: '#a7f3d0', color: '#047857', fontSize: '1rem', fontWeight: 600, borderRadius: '8px', textDecoration: 'none', transition: 'background 0.2s' }}>
+                                Get Started
+                            </Link>
+                        </div>
+
+                        {/* Solo */}
+                        <div className="pricing-card" style={{ background: '#fff', borderRadius: '24px', padding: '3rem 2.5rem', display: 'flex', flexDirection: 'column', position: 'relative', boxShadow: '0 20px 40px -15px rgba(0,0,0,0.08)' }}>
+                            <div style={{ position: 'absolute', top: '-14px', left: '50%', transform: 'translateX(-50%)', background: '#059669', color: '#fff', padding: '6px 18px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 800, letterSpacing: '0.05em' }}>
+                                RECOMMENDED
+                            </div>
+                            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.5rem', color: '#111827' }}>Solo</h3>
+                            <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '0.5rem' }}>
+                                <span style={{ fontSize: '3.5rem', fontWeight: 800, color: '#059669' }}>$19</span>
+                                <span style={{ color: '#4b5563', marginLeft: '0.25rem', fontWeight: 500 }}>/mo</span>
+                            </div>
+                            <p style={{ color: '#6b7280', marginBottom: '2.5rem', fontSize: '0.95rem' }}>50 credits monthly for growing projects.</p>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem', flexGrow: 1, marginBottom: '3rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.95rem', color: '#374151', fontWeight: 500 }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#d1fae5', borderRadius: '50%', width: '22px', height: '22px' }}>
+                                        <CheckCircle2 size={16} color="#059669" />
+                                    </div>
+                                    50 Scans / Month
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.95rem', color: '#374151', fontWeight: 500 }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#d1fae5', borderRadius: '50%', width: '22px', height: '22px' }}>
+                                        <CheckCircle2 size={16} color="#059669" />
+                                    </div>
+                                    Hourly Reaper Scan
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.95rem', color: '#374151', fontWeight: 500 }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#d1fae5', borderRadius: '50%', width: '22px', height: '22px' }}>
+                                        <CheckCircle2 size={16} color="#059669" />
+                                    </div>
+                                    Priority Email Support
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.95rem', color: '#374151', fontWeight: 500 }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#d1fae5', borderRadius: '50%', width: '22px', height: '22px' }}>
+                                        <CheckCircle2 size={16} color="#059669" />
+                                    </div>
+                                    Custom Policy Engine
+                                </div>
+                            </div>
+
+                            <Link to="/signup" style={{ display: 'block', textAlign: 'center', padding: '1rem', background: '#059669', color: '#fff', fontSize: '1rem', fontWeight: 600, borderRadius: '8px', textDecoration: 'none', transition: 'background 0.2s', boxShadow: '0 4px 6px -1px rgba(5, 150, 105, 0.25)' }}>
+                                Buy Credits
+                            </Link>
+                        </div>
+
+                        {/* Team */}
+                        <div className="pricing-card" style={{ background: '#f8fafc', borderRadius: '24px', padding: '3rem 2.5rem', display: 'flex', flexDirection: 'column' }}>
+                            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, marginBottom: '0.5rem', color: '#111827' }}>Team</h3>
+                            <div style={{ display: 'flex', alignItems: 'baseline', marginBottom: '0.5rem' }}>
+                                <span style={{ fontSize: '3.5rem', fontWeight: 800, color: '#111827' }}>$199</span>
+                                <span style={{ color: '#4b5563', marginLeft: '0.25rem', fontWeight: 500 }}>/mo</span>
+                            </div>
+                            <p style={{ color: '#6b7280', marginBottom: '2.5rem', fontSize: '0.95rem' }}>500 credits monthly for team collaboration.</p>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem', flexGrow: 1, marginBottom: '3rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.95rem', color: '#374151', fontWeight: 500 }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#d1fae5', borderRadius: '50%', width: '22px', height: '22px' }}>
+                                        <CheckCircle2 size={16} color="#059669" />
+                                    </div>
+                                    500 Scans / Month
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.95rem', color: '#374151', fontWeight: 500 }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#d1fae5', borderRadius: '50%', width: '22px', height: '22px' }}>
+                                        <CheckCircle2 size={16} color="#059669" />
+                                    </div>
+                                    Real-time Reaper Events
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.95rem', color: '#374151', fontWeight: 500 }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#d1fae5', borderRadius: '50%', width: '22px', height: '22px' }}>
+                                        <CheckCircle2 size={16} color="#059669" />
+                                    </div>
+                                    Dedicated TAM
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.95rem', color: '#374151', fontWeight: 500 }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#d1fae5', borderRadius: '50%', width: '22px', height: '22px' }}>
+                                        <CheckCircle2 size={16} color="#059669" />
+                                    </div>
+                                    SLA Guarantees
+                                </div>
+                            </div>
+
+                            <a href="/signup" style={{ display: 'block', textAlign: 'center', padding: '1rem', background: '#e5e7eb', color: '#374151', fontSize: '1rem', fontWeight: 600, borderRadius: '8px', textDecoration: 'none', transition: 'background 0.2s' }}>
+                                Buy Credits
+                            </a>
+                        </div>
+                    </div>
+
+                    {/* Detailed Comparison Table */}
+                    <div style={{ paddingBottom: '2rem' }}>
+                        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+                            <h3 style={{ fontSize: '2.2rem', fontWeight: 800, color: '#111827', display: 'inline-block', position: 'relative' }}>
+                                Detailed Comparison
+                            </h3>
+                            <div style={{ width: '40px', height: '4px', background: '#059669', borderRadius: '2px', margin: '0.5rem auto 0' }}></div>
+                        </div>
+
+                        <div style={{ overflowX: 'auto' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '800px' }}>
+                                <thead>
+                                    <tr style={{ borderBottom: '1px solid #d1d5db' }}>
+                                        <th style={{ padding: '1.5rem 1rem', fontSize: '1rem', fontWeight: 700, color: '#111827', width: '40%' }}>Feature</th>
+                                        <th style={{ padding: '1.5rem 1rem', fontSize: '1rem', fontWeight: 700, color: '#111827', width: '20%' }}>Starter</th>
+                                        <th style={{ padding: '1.5rem 1rem', fontSize: '1rem', fontWeight: 700, color: '#059669', width: '20%' }}>Solo</th>
+                                        <th style={{ padding: '1.5rem 1rem', fontSize: '1rem', fontWeight: 700, color: '#111827', width: '20%' }}>Team</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
+                                        <td style={{ padding: '1.5rem 1rem', color: '#111827', fontSize: '0.95rem', fontWeight: 500 }}>Reaper engine frequency</td>
+                                        <td style={{ padding: '1.5rem 1rem', color: '#4b5563', fontSize: '0.95rem' }}>Daily</td>
+                                        <td style={{ padding: '1.5rem 1rem', color: '#111827', fontSize: '0.95rem', fontWeight: 600 }}>Hourly</td>
+                                        <td style={{ padding: '1.5rem 1rem', color: '#4b5563', fontSize: '0.95rem' }}>Real-time</td>
+                                    </tr>
+                                    <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
+                                        <td style={{ padding: '1.5rem 1rem', color: '#111827', fontSize: '0.95rem', fontWeight: 500 }}>Number of cloud accounts</td>
+                                        <td style={{ padding: '1.5rem 1rem', color: '#4b5563', fontSize: '0.95rem' }}>1 Account</td>
+                                        <td style={{ padding: '1.5rem 1rem', color: '#111827', fontSize: '0.95rem', fontWeight: 600 }}>Up to 10</td>
+                                        <td style={{ padding: '1.5rem 1rem', color: '#4b5563', fontSize: '0.95rem' }}>Unlimited</td>
+                                    </tr>
+                                    <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
+                                        <td style={{ padding: '1.5rem 1rem', color: '#111827', fontSize: '0.95rem', fontWeight: 500 }}>Support level</td>
+                                        <td style={{ padding: '1.5rem 1rem', color: '#4b5563', fontSize: '0.95rem' }}>Docs Only</td>
+                                        <td style={{ padding: '1.5rem 1rem', color: '#111827', fontSize: '0.95rem', fontWeight: 600 }}>Priority Email</td>
+                                        <td style={{ padding: '1.5rem 1rem', color: '#4b5563', fontSize: '0.95rem' }}>24/7 Phone & TAM</td>
+                                    </tr>
+                                    <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
+                                        <td style={{ padding: '1.5rem 1rem', color: '#111827', fontSize: '0.95rem', fontWeight: 500 }}>Storage optimization alerts</td>
+                                        <td style={{ padding: '1.5rem 1rem' }}><CheckCircle2 size={24} color="#059669" strokeWidth={1.5} /></td>
+                                        <td style={{ padding: '1.5rem 1rem' }}><CheckCircle2 size={24} color="#059669" strokeWidth={1.5} /></td>
+                                        <td style={{ padding: '1.5rem 1rem' }}><CheckCircle2 size={24} color="#059669" strokeWidth={1.5} /></td>
+                                    </tr>
+                                    <tr style={{ borderBottom: '1px solid #f3f4f6' }}>
+                                        <td style={{ padding: '1.5rem 1rem', color: '#111827', fontSize: '0.95rem', fontWeight: 500 }}>Custom tagging logic</td>
+                                        <td style={{ padding: '1.5rem 1rem', color: '#9ca3af' }}>—</td>
+                                        <td style={{ padding: '1.5rem 1rem' }}><CheckCircle2 size={24} color="#059669" strokeWidth={1.5} /></td>
+                                        <td style={{ padding: '1.5rem 1rem' }}><CheckCircle2 size={24} color="#059669" strokeWidth={1.5} /></td>
+                                    </tr>
+                                    <tr>
+                                        <td style={{ padding: '1.5rem 1rem', color: '#111827', fontSize: '0.95rem', fontWeight: 500 }}>Multi-region consolidation</td>
+                                        <td style={{ padding: '1.5rem 1rem', color: '#9ca3af' }}>—</td>
+                                        <td style={{ padding: '1.5rem 1rem', color: '#9ca3af' }}>—</td>
+                                        <td style={{ padding: '1.5rem 1rem' }}><CheckCircle2 size={24} color="#059669" strokeWidth={1.5} /></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
             {/* CTA Section */}
             <section className="cta-section">
                 <div className="cta-box">
@@ -179,7 +385,7 @@ const Home = () => {
                         <p>Join our platform to automate cloud storage cost reductions with Flux's automated reaper engine.</p>
                     </div>
                     <div className="cta-buttons">
-                        <Link to="/login" className="cta-btn-primary">Get Started Now</Link>
+                        <Link to="/signup" className="cta-btn-primary">Get Started Now</Link>
                         <a href="#sales" className="cta-btn-secondary">Talk to Sales</a>
                     </div>
                 </div>

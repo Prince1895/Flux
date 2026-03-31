@@ -65,7 +65,7 @@ const Signup = () => {
 
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: '#e0f2e9', color: '#00d65b', padding: '0.3rem 0.8rem', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.05em', marginBottom: '1.5rem' }}>
                         <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#00d65b' }}></div>
-                        FREE 14-DAY TRIAL
+                        5 FREE SCANS
                     </div>
 
                     <h1 style={{ fontSize: '3.2rem', fontWeight: 800, color: '#111827', marginBottom: '0.5rem', lineHeight: 1.1, letterSpacing: '-0.02em' }}>

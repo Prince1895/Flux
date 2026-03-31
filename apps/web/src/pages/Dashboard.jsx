@@ -24,6 +24,10 @@ const Dashboard = () => {
     const [totalSavings, setTotalSavings] = useState(0);
     const [reapedSavings, setReapedSavings] = useState(0);
 
+    // Billing
+    const [scanCredits, setScanCredits] = useState(0);
+    const [tenantPlan, setTenantPlan] = useState('starter');
+
     const fetchZombies = async () => {
         setLoading(true);
         try {
@@ -55,17 +59,30 @@ const Dashboard = () => {
         }
     };
 
+    const fetchBilling = async () => {
+        try {
+            const b = await api.getBillingStatus();
+            setScanCredits(b.scan_credits || 0);
+            setTenantPlan(b.plan || 'starter');
+        } catch (e) {
+            console.error('Failed to fetch billing', e);
+        }
+    };
+
     useEffect(() => {
         fetchZombies();
-        // Read tenant name from the user object stored during login/signup
         if (user?.company_name) setTenantName(user.company_name);
+        fetchBilling();
     }, []);
 
     const handleReap = async (zombieId) => {
         setReapingId(zombieId);
         try {
             await api.reapZombie(zombieId);
-            setTimeout(() => fetchZombies(), 1000);
+            setTimeout(() => {
+                fetchZombies();
+                fetchBilling(); // Refresh credits and plan after reap
+            }, 1000);
         } catch (err) {
             alert(`Reap Failed: ${err.message || 'Unknown error'}`);
         } finally {
@@ -106,6 +123,9 @@ const Dashboard = () => {
                     <a href="#" className="dash-nav-item">
                         <Users size={18} /> Team
                     </a>
+                    <Link to="/dashboard/pricing" className="dash-nav-item">
+                        <DollarSign size={18} /> Upgrade Plan
+                    </Link>
                 </nav>
 
                 <div className="dash-sidebar-footer">
@@ -145,7 +165,11 @@ const Dashboard = () => {
                             </p>
                         )}
                     </div>
-                    <div className="dash-header-actions">
+                    <div className="dash-header-actions" style={{ alignItems: 'center' }}>
+                        <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', padding: '0.4rem 0.8rem', borderRadius: '20px', fontSize: '0.85rem', display: 'flex', gap: '0.6rem', alignItems: 'center', marginRight: '0.5rem', color: '#374151', fontWeight: 600 }}>
+                            <div style={{ background: tenantPlan === 'starter' ? '#e5e7eb' : '#dcfce7', color: tenantPlan === 'starter' ? '#4b5563' : '#15803d', border: `1px solid ${tenantPlan === 'starter' ? '#d1d5db' : '#bbf7d0'}`, padding: '0.15rem 0.5rem', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.02em' }}>{tenantPlan}</div>
+                            <span>{scanCredits} Credits Left</span>
+                        </div>
                         <button className="dash-icon-btn"><Sun size={20} /></button>
                         <button className="dash-icon-btn" style={{ position: 'relative' }}>
                             <Bell size={20} />
@@ -171,7 +195,6 @@ const Dashboard = () => {
                             </div>
                             <div className="dash-metric-value">
                                 {totalZombies}
-                                <span className="dash-metric-trend trend-down">↑ 12%</span>
                             </div>
                             <div className="dash-metric-subtitle">
                                 Resources idle &gt; 30 days
@@ -189,7 +212,7 @@ const Dashboard = () => {
                             <div className="dash-metric-value">
                                 ${totalSavings.toFixed(2)}
                             </div>
-                            <div className="dash-metric-subtitle">
+                            <div className="dash-metric-subtitle" style={{ color: 'red' }}>
                                 Projected annual waste: ${(totalSavings * 12).toLocaleString()}
                             </div>
                         </div>
@@ -204,12 +227,7 @@ const Dashboard = () => {
                             <div className="dash-metric-value text-neon" style={{ fontSize: '2.5rem' }}>
                                 ${reapedSavings.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                             </div>
-                            <div className="dash-metric-progress">
-                                <div className="progress-bar-container">
-                                    <div className="progress-bar-fill" style={{ width: '75%' }}></div>
-                                </div>
-                                <span>75% of monthly goal reached</span>
-                            </div>
+
                         </div>
 
                     </div>

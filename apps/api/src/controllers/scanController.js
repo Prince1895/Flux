@@ -10,6 +10,31 @@ exports.runScan = async (req, res) => {
         const { cloud_account_id } = req.body;
         const tenant_id = req.user.tenant_id;
 
+        // --- BILLING LOGIC CHECK ---
+        const tenantResult = await db.query(
+            'SELECT plan, scan_credits, current_period_start FROM tenants WHERE id = $1',
+            [tenant_id]
+        );
+        let tenant = tenantResult.rows[0];
+
+        if (tenant && tenant.plan === 'starter') {
+            const oneMonthAgo = new Date();
+            oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+            if (new Date(tenant.current_period_start) < oneMonthAgo) {
+                // Reset credits to 5 for new month
+                const updateRes = await db.query(
+                    "UPDATE tenants SET scan_credits = 5, current_period_start = NOW() WHERE id = $1 RETURNING *",
+                    [tenant_id]
+                );
+                tenant = updateRes.rows[0];
+            }
+        }
+
+        if (!tenant || tenant.scan_credits <= 0) {
+            return res.status(403).json({ error: 'Insufficient scan credits. Please upgrade your plan or wait for the next billing cycle.' });
+        }
+        // --- END BILLING LOGIC CHECK ---
+
         // 1. Ensure the user owns this cloud account
         const accountResult = await db.query(
             'SELECT * FROM cloud_accounts WHERE id = $1 AND tenant_id = $2',
@@ -68,6 +93,12 @@ exports.runScan = async (req, res) => {
                 insertedCount++;
             }
         }
+
+        // --- BILLING DEDUCTION ---
+        await db.query(
+            'UPDATE tenants SET scan_credits = scan_credits - 1 WHERE id = $1',
+            [tenant_id]
+        );
 
         res.status(200).json({
             message: 'Scan completed successfully!',

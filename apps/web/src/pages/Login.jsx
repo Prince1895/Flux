@@ -124,7 +124,7 @@ const Login = () => {
                         </div>
 
                         <div style={{ textAlign: 'center', marginTop: '2.5rem', fontSize: '0.9rem', color: '#6b7280' }}>
-                            Not a member yet? <Link to="/signup" style={{ color: '#00d65b', fontWeight: 600, textDecoration: 'none' }}>Start a 14 day free trial</Link>
+                            Not a member yet? <Link to="/signup" style={{ color: '#00d65b', fontWeight: 600, textDecoration: 'none' }}>Join a Starter Plan</Link>
                         </div>
 
                     </div>

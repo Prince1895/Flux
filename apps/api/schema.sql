@@ -5,9 +5,12 @@
 -- 1. Tenants (organisations / companies)
 -- ─────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS tenants (
-    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name       TEXT NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW()
+    id                   UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name                 TEXT NOT NULL,
+    plan                 TEXT DEFAULT 'starter',
+    scan_credits         INTEGER DEFAULT 5,
+    current_period_start TIMESTAMPTZ DEFAULT NOW(),
+    created_at           TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- ─────────────────────────────────────────────
@@ -64,3 +67,10 @@ CREATE TABLE IF NOT EXISTS reaping_logs (
     savings_achieved NUMERIC(10, 2) DEFAULT 0,
     created_at       TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- ─────────────────────────────────────────────
+-- 6. Schema Updates (Migration)
+-- ─────────────────────────────────────────────
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS plan TEXT DEFAULT 'starter';
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS scan_credits INTEGER DEFAULT 5;
+ALTER TABLE tenants ADD COLUMN IF NOT EXISTS current_period_start TIMESTAMPTZ DEFAULT NOW();

@@ -59,7 +59,13 @@ const CloudAccounts = () => {
             await api.runScan(id);
             alert('Scan started! Refresh in a moment to see new zombie resources.');
         } catch (err) {
-            alert('Scan failed: ' + (err.message || 'Unknown error'));
+            if (err.response && err.response.status === 403) {
+                if (window.confirm("You have run out of scan credits! Would you like to upgrade your plan?")) {
+                    navigate('/dashboard/pricing');
+                }
+            } else {
+                alert('Scan failed: ' + (err.response?.data?.error || err.message || 'Unknown error'));
+            }
         } finally {
             setScanningId(null);
         }

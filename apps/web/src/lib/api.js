@@ -54,4 +54,14 @@ export const api = {
         const res = await apiClient.post(`/api/reap/${zombieId}`);
         return res.data;
     },
+
+    // Billing
+    getBillingStatus: async () => {
+        const res = await apiClient.get('/api/billing/status');
+        return res.data;
+    },
+    upgradePlan: async (target_plan) => {
+        const res = await apiClient.post('/api/billing/upgrade', { target_plan });
+        return res.data;
+    }
 };
