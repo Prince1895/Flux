@@ -11,13 +11,25 @@ const automationRoutes = require('./routes/automationRoutes');
 const db = require('./config/db');
 
 const reportRoutes = require('./routes/reportRoutes');
+const session = require('express-session');
+const passport = require('./config/passport');
+const oauthRoutes = require('./routes/oauthRoutes');
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
+app.use(session({
+  secret: process.env.JWT_SECRET || 'fallback_session_secret',
+  resave: false,
+  saveUninitialized: false
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+
 app.use('/api/auth', authRoutes);
+app.use('/api/auth', oauthRoutes);
 app.use('/api/scans', verifyJWT, scanRoutes);
 app.use('/api/accounts', verifyJWT, accountRoutes);
 app.use('/api/reap', verifyJWT, reapRoutes);

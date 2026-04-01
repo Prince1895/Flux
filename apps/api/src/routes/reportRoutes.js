@@ -11,4 +11,7 @@ router.get('/summary', reportController.getSummary);
 // POST /api/reports/send
 router.post('/send', reportController.sendManualReport);
 
+// POST /api/reports/preview
+router.post('/preview', reportController.previewManualReport);
+
 module.exports = router;

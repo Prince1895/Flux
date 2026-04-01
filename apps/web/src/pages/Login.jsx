@@ -60,6 +60,26 @@ const Login = () => {
                             Please enter your details to sign in to your optimization dashboard.
                         </p>
 
+                        {/* OAuth Login Buttons */}
+                        <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
+                            <button
+                                onClick={() => window.location.href = 'http://localhost:4000/api/auth/google'}
+                                style={{ flex: 1, padding: '0.75rem', background: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', color: '#374151', transition: 'background 0.2s' }}>
+                                <GoogleIcon /> Google
+                            </button>
+                            <button
+                                onClick={() => window.location.href = 'http://localhost:4000/api/auth/github'}
+                                style={{ flex: 1, padding: '0.75rem', background: '#111827', border: '1px solid #111827', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', fontSize: '0.9rem', fontWeight: 600, cursor: 'pointer', boxShadow: '0 1px 2px rgba(0,0,0,0.05)', color: '#fff', transition: 'background 0.2s' }}>
+                                <Github size={18} /> GitHub
+                            </button>
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'center', margin: '1.5rem 0', color: '#9ca3af' }}>
+                            <div style={{ flex: 1, height: '1px', background: '#e5e7eb' }}></div>
+                            <span style={{ padding: '0 1rem', fontSize: '0.8rem', fontWeight: 500, letterSpacing: '0.05em', textTransform: 'uppercase' }}>or sign in with email</span>
+                            <div style={{ flex: 1, height: '1px', background: '#e5e7eb' }}></div>
+                        </div>
+
                         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                             {error && (
                                 <div style={{ padding: '0.75rem', background: '#fef2f2', border: '1px solid #ef4444', color: '#ef4444', borderRadius: '8px', fontSize: '0.9rem' }}>

@@ -1,5 +1,5 @@
 const db = require('../config/db');
-const { sendScanReport } = require('../services/emailService');
+const { sendScanReport, getScanReportHTML } = require('../services/emailService');
 
 /**
  * GET /api/reports/summary
@@ -103,5 +103,52 @@ exports.sendManualReport = async (req, res) => {
     } catch (err) {
         console.error('[Reports] sendManualReport error:', err);
         res.status(500).json({ error: 'Failed to queue report' });
+    }
+};
+
+/**
+ * POST /api/reports/preview
+ * Body: { account_id }
+ * Generates the HTML string for the email report so the frontend can preview it.
+ */
+exports.previewManualReport = async (req, res) => {
+    try {
+        const tenant_id = req.user.tenant_id;
+        const { account_id } = req.body;
+
+        if (!account_id) return res.status(400).json({ error: 'account_id is required' });
+
+        const accResult = await db.query(
+            'SELECT * FROM cloud_accounts WHERE id = $1 AND tenant_id = $2',
+            [account_id, tenant_id]
+        );
+        const account = accResult.rows[0];
+        if (!account) return res.status(404).json({ error: 'Cloud account not found' });
+
+        const zResult = await db.query(
+            "SELECT * FROM zombie_resources WHERE account_id = $1 AND tenant_id = $2 AND status = 'pending' ORDER BY estimated_monthly_cost DESC",
+            [account_id, tenant_id]
+        );
+        const allZombies = zResult.rows;
+
+        const totalSavings = allZombies.reduce((s, z) => s + Number(z.estimated_monthly_cost || 0), 0);
+        const breakdown = {};
+        allZombies.forEach(z => {
+            breakdown[z.resource_type] = (breakdown[z.resource_type] || 0) + 1;
+        });
+
+        const html = getScanReportHTML({
+            accountName: account.account_alias || account.name || account.id,
+            region: account.region || 'us-east-1',
+            zombies_found: allZombies.length,
+            estimated_monthly_savings_usd: totalSavings,
+            breakdown,
+            scannedAt: new Date().toISOString(),
+        }, allZombies);
+
+        res.json({ html });
+    } catch (err) {
+        console.error('[Reports] previewManualReport error:', err);
+        res.status(500).json({ error: 'Failed to generate preview' });
     }
 };

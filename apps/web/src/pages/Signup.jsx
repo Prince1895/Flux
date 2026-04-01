@@ -78,6 +78,28 @@ const Signup = () => {
                         Create your account and regain control of your cloud storage costs today.
                     </p>
 
+                    {/* OAuth Signup Buttons */}
+                    <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
+                        <button
+                            onClick={() => window.location.href = 'http://localhost:4000/api/auth/google'}
+                            type="button"
+                            style={{ flex: 1, padding: '0.85rem', background: '#fff', border: '1px solid #d1d5db', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem', fontSize: '0.95rem', fontWeight: 600, cursor: 'pointer', boxShadow: '0 2px 5px rgba(0,0,0,0.02)', color: '#374151', transition: 'background 0.2s' }}>
+                            <GoogleIcon /> Google
+                        </button>
+                        <button
+                            onClick={() => window.location.href = 'http://localhost:4000/api/auth/github'}
+                            type="button"
+                            style={{ flex: 1, padding: '0.85rem', background: '#111827', border: '1px solid #111827', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem', fontSize: '0.95rem', fontWeight: 600, cursor: 'pointer', boxShadow: '0 2px 5px rgba(0,0,0,0.05)', color: '#fff', transition: 'background 0.2s' }}>
+                            <Github size={18} /> GitHub
+                        </button>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', margin: '2rem 0', color: '#9ca3af' }}>
+                        <div style={{ flex: 1, height: '1px', background: '#d1d5db' }}></div>
+                        <span style={{ padding: '0 1rem', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>or sign up with email</span>
+                        <div style={{ flex: 1, height: '1px', background: '#d1d5db' }}></div>
+                    </div>
+
                     <form onSubmit={handleSignup} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                         {error && (
                             <div style={{ padding: '0.75rem', background: '#fef2f2', border: '1px solid #ef4444', color: '#ef4444', borderRadius: '8px', fontSize: '0.9rem' }}>

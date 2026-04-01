@@ -16,6 +16,19 @@ app.listen(PORT, async () => {
     await db.query(`ALTER TABLE tenants ADD COLUMN IF NOT EXISTS scan_credits INTEGER DEFAULT 5;`);
     await db.query(`ALTER TABLE tenants ADD COLUMN IF NOT EXISTS current_period_start TIMESTAMPTZ DEFAULT NOW();`);
 
+    // OAuth migrations for users table
+    await db.query(`ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL;`);
+    await db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS oauth_provider VARCHAR(50);`);
+    await db.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS oauth_id VARCHAR(255);`);
+    await db.query(`
+      DO $$
+      BEGIN
+        IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'unique_oauth_id') THEN
+          ALTER TABLE users ADD CONSTRAINT unique_oauth_id UNIQUE (oauth_provider, oauth_id);
+        END IF;
+      END $$;
+    `);
+
     // Automation schedules table
     await db.query(`
       CREATE TABLE IF NOT EXISTS automation_schedules (

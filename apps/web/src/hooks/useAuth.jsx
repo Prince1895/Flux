@@ -38,10 +38,33 @@ export const AuthProvider = ({ children }) => {
 
     // Restore session from localStorage on mount
     useEffect(() => {
-        const storedUser = getStoredUser();
-        const storedToken = getStoredToken();
-        if (storedUser && storedToken) {
-            setUser(storedUser);
+        const params = new URLSearchParams(window.location.search);
+        const urlToken = params.get('token');
+
+        if (urlToken) {
+            try {
+                // Decode JWT Payload
+                const payload = JSON.parse(atob(urlToken.split('.')[1]));
+                const oauthUser = {
+                    id: payload.id,
+                    email: payload.email,
+                    tenant_id: payload.tenant_id,
+                    role: payload.role,
+                    company_name: payload.company_name
+                };
+                saveSession(urlToken, oauthUser);
+                setUser(oauthUser);
+                // Clean the token from the URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            } catch (err) {
+                console.error('Failed to parse OAuth token:', err);
+            }
+        } else {
+            const storedUser = getStoredUser();
+            const storedToken = getStoredToken();
+            if (storedUser && storedToken) {
+                setUser(storedUser);
+            }
         }
         setLoading(false);
     }, []);

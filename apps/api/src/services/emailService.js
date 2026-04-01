@@ -12,12 +12,9 @@ const transporter = nodemailer.createTransport({
 });
 
 /**
- * Sends a styled HTML scan report email.
- * @param {string} to - recipient email
- * @param {object} summary - { accountName, region, zombies_found, estimated_monthly_savings_usd, breakdown, scannedAt }
- * @param {Array}  zombies - array of zombie_resource rows
+ * Generates the styled HTML string for the scan report.
  */
-const sendScanReport = async (to, summary, zombies = []) => {
+const getScanReportHTML = (summary, zombies = []) => {
     const {
         accountName = 'Your Account',
         region = 'us-east-1',
@@ -56,8 +53,7 @@ const sendScanReport = async (to, summary, zombies = []) => {
         ? `<p style="margin:8px 0 0;font-size:12px;color:#6b7280;text-align:center;">...and ${zombies.length - 10} more. View all in your dashboard.</p>`
         : '';
 
-    const html = `
-<!DOCTYPE html>
+    return `<!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#f8fafc;font-family:'Segoe UI',Arial,sans-serif;">
@@ -156,8 +152,19 @@ const sendScanReport = async (to, summary, zombies = []) => {
 </table>
 </body>
 </html>`;
+};
 
-    const subject = `⚡ Scan Report: ${zombies_found} zombie${zombies_found !== 1 ? 's' : ''} found in ${accountName} — ${savingsFormatted}/mo wasted`;
+/**
+ * Sends a styled HTML scan report email.
+ * @param {string} to - recipient email
+ * @param {object} summary - { accountName, region, zombies_found, estimated_monthly_savings_usd, breakdown, scannedAt }
+ * @param {Array}  zombies - array of zombie_resource rows
+ */
+const sendScanReport = async (to, summary, zombies = []) => {
+    const html = getScanReportHTML(summary, zombies);
+    const savingsFormatted = `$${Number(summary.estimated_monthly_savings_usd || 0).toFixed(2)}`;
+    const subject = `⚡ Scan Report: ${summary.zombies_found || 0} zombie${summary.zombies_found !== 1 ? 's' : ''} found in ${summary.accountName || 'Your Account'} — ${savingsFormatted}/mo wasted`;
+
     await queueEmail(to, subject, html);
 };
 
@@ -214,4 +221,4 @@ const processEmailQueue = async () => {
     }
 };
 
-module.exports = { sendScanReport, queueEmail, processEmailQueue };
+module.exports = { sendScanReport, queueEmail, processEmailQueue, getScanReportHTML };

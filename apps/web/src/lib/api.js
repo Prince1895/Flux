@@ -83,6 +83,10 @@ export const api = {
         const res = await apiClient.get('/api/reports/summary');
         return res.data;
     },
+    getReportPreview: async (account_id) => {
+        const res = await apiClient.post('/api/reports/preview', { account_id });
+        return res.data;
+    },
     sendManualReport: async (account_id) => {
         const res = await apiClient.post('/api/reports/send', { account_id });
         return res.data;
