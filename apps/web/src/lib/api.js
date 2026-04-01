@@ -63,5 +63,19 @@ export const api = {
     upgradePlan: async (target_plan) => {
         const res = await apiClient.post('/api/billing/upgrade', { target_plan });
         return res.data;
-    }
+    },
+
+    // Automation
+    getAutomationSchedules: async () => {
+        const res = await apiClient.get('/api/automation');
+        return res.data;
+    },
+    upsertAutomationSchedule: async (payload) => {
+        const res = await apiClient.post('/api/automation', payload);
+        return res.data;
+    },
+    toggleAutomationSchedule: async (id) => {
+        const res = await apiClient.patch(`/api/automation/${id}/toggle`);
+        return res.data;
+    },
 };

@@ -7,6 +7,7 @@ const reapRoutes = require('./routes/reapRoutes');
 const zombieRoutes = require('./routes/zombieRoutes');
 const { verifyJWT } = require('./middlewares/authMiddleware.js');
 const billingRoutes = require('./routes/billingRoutes');
+const automationRoutes = require('./routes/automationRoutes');
 const db = require('./config/db');
 
 const app = express();
@@ -20,6 +21,7 @@ app.use('/api/accounts', verifyJWT, accountRoutes);
 app.use('/api/reap', verifyJWT, reapRoutes);
 app.use('/api/zombies', verifyJWT, zombieRoutes);
 app.use('/api/billing', verifyJWT, billingRoutes);
+app.use('/api/automation', verifyJWT, automationRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'flux API running' });

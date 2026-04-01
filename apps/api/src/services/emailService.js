@@ -1,0 +1,169 @@
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: parseInt(process.env.SMTP_PORT || '587'),
+    secure: false,
+    auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+    },
+});
+
+/**
+ * Sends a styled HTML scan report email.
+ * @param {string} to - recipient email
+ * @param {object} summary - { accountName, region, zombies_found, estimated_monthly_savings_usd, breakdown, scannedAt }
+ * @param {Array}  zombies - array of zombie_resource rows
+ */
+const sendScanReport = async (to, summary, zombies = []) => {
+    const {
+        accountName = 'Your Account',
+        region = 'us-east-1',
+        zombies_found = 0,
+        estimated_monthly_savings_usd = 0,
+        breakdown = {},
+        scannedAt = new Date().toISOString(),
+    } = summary;
+
+    const savingsFormatted = `$${Number(estimated_monthly_savings_usd).toFixed(2)}`;
+    const annualSavings = `$${(Number(estimated_monthly_savings_usd) * 12).toLocaleString()}`;
+    const scanDate = new Date(scannedAt).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+
+    const breakdownRows = Object.entries(breakdown)
+        .filter(([, count]) => count > 0)
+        .map(([type, count]) => `
+            <tr>
+                <td style="padding:10px 16px;border-bottom:1px solid #f1f5f9;font-size:13px;color:#374151;">
+                    ${type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
+                </td>
+                <td style="padding:10px 16px;border-bottom:1px solid #f1f5f9;font-size:13px;font-weight:700;color:#dc2626;text-align:center;">
+                    ${count}
+                </td>
+            </tr>
+        `).join('');
+
+    const zombieTableRows = zombies.slice(0, 10).map(z => `
+        <tr>
+            <td style="padding:9px 14px;border-bottom:1px solid #f1f5f9;font-family:monospace;font-size:12px;color:#111827;">${z.external_id}</td>
+            <td style="padding:9px 14px;border-bottom:1px solid #f1f5f9;font-size:12px;color:#6b7280;">${(z.resource_type || '').replace(/_/g, ' ').toUpperCase()}</td>
+            <td style="padding:9px 14px;border-bottom:1px solid #f1f5f9;font-size:12px;color:#dc2626;font-weight:700;">$${Number(z.estimated_monthly_cost || 0).toFixed(2)}/mo</td>
+        </tr>
+    `).join('');
+
+    const moreNote = zombies.length > 10
+        ? `<p style="margin:8px 0 0;font-size:12px;color:#6b7280;text-align:center;">...and ${zombies.length - 10} more. View all in your dashboard.</p>`
+        : '';
+
+    const html = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#f8fafc;font-family:'Segoe UI',Arial,sans-serif;">
+
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;padding:32px 0;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+
+  <!-- Header -->
+  <tr>
+    <td style="background:linear-gradient(135deg,#0f172a 0%,#1e293b 100%);padding:32px 40px;text-align:center;">
+      <p style="margin:0 0 6px;font-size:13px;color:#00d65b;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;">⚡ GreenOps Reaper</p>
+      <h1 style="margin:0;font-size:26px;font-weight:800;color:#ffffff;">Automated Scan Report</h1>
+      <p style="margin:8px 0 0;font-size:13px;color:#94a3b8;">${accountName} · ${region} · ${scanDate}</p>
+    </td>
+  </tr>
+
+  <!-- Stats Row -->
+  <tr>
+    <td style="padding:32px 40px 0;">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td width="50%" style="padding-right:8px;">
+            <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:20px;text-align:center;">
+              <p style="margin:0 0 4px;font-size:11px;font-weight:700;color:#6b7280;letter-spacing:0.06em;text-transform:uppercase;">Zombies Found</p>
+              <p style="margin:0;font-size:36px;font-weight:800;color:#dc2626;">${zombies_found}</p>
+            </div>
+          </td>
+          <td width="50%" style="padding-left:8px;">
+            <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:20px;text-align:center;">
+              <p style="margin:0 0 4px;font-size:11px;font-weight:700;color:#6b7280;letter-spacing:0.06em;text-transform:uppercase;">Monthly Waste</p>
+              <p style="margin:0;font-size:36px;font-weight:800;color:#00d65b;">${savingsFormatted}</p>
+            </div>
+          </td>
+        </tr>
+      </table>
+      <p style="text-align:center;margin:12px 0 0;font-size:13px;color:#ef4444;font-weight:600;">
+        💸 Projected annual waste: <strong>${annualSavings}</strong>
+      </p>
+    </td>
+  </tr>
+
+  ${breakdownRows ? `
+  <!-- Breakdown -->
+  <tr>
+    <td style="padding:28px 40px 0;">
+      <h2 style="margin:0 0 12px;font-size:14px;font-weight:700;color:#111827;text-transform:uppercase;letter-spacing:0.05em;">By Resource Type</h2>
+      <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;">
+        <tr style="background:#f9fafb;">
+          <th style="padding:10px 16px;font-size:11px;font-weight:700;color:#6b7280;text-align:left;text-transform:uppercase;letter-spacing:0.05em;">Resource Type</th>
+          <th style="padding:10px 16px;font-size:11px;font-weight:700;color:#6b7280;text-align:center;text-transform:uppercase;letter-spacing:0.05em;">Count</th>
+        </tr>
+        ${breakdownRows}
+      </table>
+    </td>
+  </tr>` : ''}
+
+  ${zombieTableRows ? `
+  <!-- Top Resources -->
+  <tr>
+    <td style="padding:24px 40px 0;">
+      <h2 style="margin:0 0 12px;font-size:14px;font-weight:700;color:#111827;text-transform:uppercase;letter-spacing:0.05em;">Top Zombie Resources</h2>
+      <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;">
+        <tr style="background:#f9fafb;">
+          <th style="padding:10px 14px;font-size:11px;font-weight:700;color:#6b7280;text-align:left;text-transform:uppercase;">Resource ID</th>
+          <th style="padding:10px 14px;font-size:11px;font-weight:700;color:#6b7280;text-align:left;text-transform:uppercase;">Type</th>
+          <th style="padding:10px 14px;font-size:11px;font-weight:700;color:#6b7280;text-align:left;text-transform:uppercase;">Cost/mo</th>
+        </tr>
+        ${zombieTableRows}
+      </table>
+      ${moreNote}
+    </td>
+  </tr>` : ''}
+
+  <!-- CTA -->
+  <tr>
+    <td style="padding:32px 40px;text-align:center;">
+      <a href="${process.env.APP_URL || 'http://localhost:5173'}/dashboard"
+         style="background:#00d65b;color:#ffffff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:700;font-size:15px;display:inline-block;">
+        ⚡ View Dashboard &amp; Reap Resources
+      </a>
+    </td>
+  </tr>
+
+  <!-- Footer -->
+  <tr>
+    <td style="background:#f8fafc;border-top:1px solid #e5e7eb;padding:20px 40px;text-align:center;">
+      <p style="margin:0;font-size:12px;color:#9ca3af;">
+        This is an automated report from GreenOps Reaper. Manage your automation settings in your dashboard.
+      </p>
+    </td>
+  </tr>
+
+</table>
+</td></tr>
+</table>
+</body>
+</html>`;
+
+    await transporter.sendMail({
+        from: process.env.SMTP_FROM || '"GreenOps Reaper" <noreply@greenops.io>',
+        to,
+        subject: `⚡ Scan Report: ${zombies_found} zombie${zombies_found !== 1 ? 's' : ''} found in ${accountName} — ${savingsFormatted}/mo wasted`,
+        html,
+    });
+
+    console.log(`[Email] Scan report sent to ${to}`);
+};
+
+module.exports = { sendScanReport };
