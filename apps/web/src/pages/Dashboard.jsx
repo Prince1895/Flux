@@ -109,9 +109,9 @@ const Dashboard = () => {
                     <Link to="/dashboard/accounts" className="dash-nav-item">
                         <Cloud size={18} /> Cloud Accounts
                     </Link>
-                    <a href="#" className="dash-nav-item">
+                    <Link to="/dashboard/automation" className="dash-nav-item">
                         <Zap size={18} /> Automation
-                    </a>
+                    </Link>
                     <a href="#" className="dash-nav-item">
                         <BarChart2 size={18} /> Reports
                     </a>

@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './hooks/useAuth';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import CloudAccounts from './pages/CloudAccounts';
+import Automation from './pages/Automation';
 import Connect from './pages/Connect';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -40,6 +41,14 @@ const AppRouter = () => {
         element={
           <ProtectedRoute>
             <CloudAccounts />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dashboard/automation"
+        element={
+          <ProtectedRoute>
+            <Automation />
           </ProtectedRoute>
         }
       />
