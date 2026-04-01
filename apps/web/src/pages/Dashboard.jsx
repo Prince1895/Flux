@@ -18,6 +18,7 @@ const Dashboard = () => {
     const [reapingId, setReapingId] = useState(null);
     const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
     const [tenantName, setTenantName] = useState('');
+    const [reapTarget, setReapTarget] = useState(null); // zombie to confirm reap for
 
     // Stats
     const [totalZombies, setTotalZombies] = useState(0);
@@ -43,9 +44,9 @@ const Dashboard = () => {
             data.forEach(z => {
                 if (z.status === 'pending') {
                     active++;
-                    savings += (z.estimated_monthly_cost || 0);
+                    savings += Number(z.estimated_monthly_cost || 0);
                 } else if (z.status === 'reaped') {
-                    recovered += (z.estimated_monthly_cost || 0);
+                    recovered += Number(z.estimated_monthly_cost || 0);
                 }
             });
 
@@ -77,11 +78,12 @@ const Dashboard = () => {
 
     const handleReap = async (zombieId) => {
         setReapingId(zombieId);
+        setReapTarget(null);
         try {
             await api.reapZombie(zombieId);
             setTimeout(() => {
                 fetchZombies();
-                fetchBilling(); // Refresh credits and plan after reap
+                fetchBilling();
             }, 1000);
         } catch (err) {
             alert(`Reap Failed: ${err.message || 'Unknown error'}`);
@@ -210,10 +212,10 @@ const Dashboard = () => {
                                 </div>
                             </div>
                             <div className="dash-metric-value">
-                                ${totalSavings.toFixed(2)}
+                                ${Number(totalSavings).toFixed(2)}
                             </div>
                             <div className="dash-metric-subtitle" style={{ color: 'red' }}>
-                                Projected annual waste: ${(totalSavings * 12).toLocaleString()}
+                                Projected annual waste: ${(Number(totalSavings) * 12).toLocaleString()}
                             </div>
                         </div>
 
@@ -289,7 +291,7 @@ const Dashboard = () => {
                                                 </span>
                                             </td>
                                             <td style={{ fontWeight: 600 }}>
-                                                ${z.estimated_monthly_cost?.toFixed(2)}
+                                                ${Number(z.estimated_monthly_cost || 0).toFixed(2)}
                                             </td>
                                             <td>
                                                 {z.status === 'reaped' ? (
@@ -308,10 +310,15 @@ const Dashboard = () => {
                                             </td>
                                             <td style={{ textAlign: 'right' }}>
                                                 {z.status === 'pending' ? (
-                                                    // In mockup it's just a 3-dot menu or an action. We'll leave the reap button for UX, but stylized, or just 3 dots.
-                                                    // Let's hide the direct "Reap" button behind a subtle dots or keep it if they want to reap. The mockup shows 3 vertical dots.
-                                                    <button className="dash-icon-btn-small" title="Actions" onClick={() => handleReap(z.id)}>
-                                                        {reapingId === z.id ? <RefreshCw size={18} className="spin" /> : <MoreVertical size={18} />}
+                                                    <button
+                                                        className="reap-btn"
+                                                        title="Reap this resource"
+                                                        onClick={() => setReapTarget(z)}
+                                                        disabled={!!reapingId}
+                                                    >
+                                                        {reapingId === z.id
+                                                            ? <RefreshCw size={14} className="spin" />
+                                                            : '⚡ Reap'}
                                                     </button>
                                                 ) : (
                                                     <button className="dash-icon-btn-small" title="Actions">
@@ -338,6 +345,46 @@ const Dashboard = () => {
 
             {isConnectModalOpen && (
                 <ConnectModal onClose={() => setIsConnectModalOpen(false)} />
+            )}
+
+            {/* ── Reap Confirmation Modal ── */}
+            {reapTarget && (
+                <div className="reap-modal-overlay" onClick={() => setReapTarget(null)}>
+                    <div className="reap-modal" onClick={e => e.stopPropagation()}>
+                        <div className="reap-modal-icon">⚠️</div>
+                        <h2 className="reap-modal-title">Permanently Delete Resource?</h2>
+                        <p className="reap-modal-body">
+                            You are about to <strong>permanently delete</strong> the following AWS resource.
+                            This action <strong>cannot be undone</strong>.
+                        </p>
+                        <div className="reap-modal-resource-box">
+                            <div className="reap-modal-resource-type">
+                                {reapTarget.resource_type.replace(/_/g, ' ').toUpperCase()}
+                            </div>
+                            <div className="reap-modal-resource-id">{reapTarget.external_id}</div>
+                            <div className="reap-modal-resource-meta">
+                                {reapTarget.region} &nbsp;•&nbsp; ~${Number(reapTarget.estimated_monthly_cost || 0).toFixed(2)}/mo
+                            </div>
+                        </div>
+                        {reapTarget.resource_type === 'ec2_instance' && (
+                            <p className="reap-modal-danger-note">
+                                🔴 <strong>Warning:</strong> Terminating an EC2 instance will also delete its root EBS volume if <code>DeleteOnTermination</code> is enabled.
+                            </p>
+                        )}
+                        <div className="reap-modal-actions">
+                            <button className="reap-modal-cancel" onClick={() => setReapTarget(null)}>Cancel</button>
+                            <button
+                                className="reap-modal-confirm"
+                                onClick={() => handleReap(reapTarget.id)}
+                                disabled={!!reapingId}
+                            >
+                                {reapingId === reapTarget.id
+                                    ? <><RefreshCw size={14} className="spin" /> Reaping...</>
+                                    : '⚡ Yes, Reap It'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );

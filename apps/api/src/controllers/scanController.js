@@ -1,9 +1,19 @@
 const db = require('../config/db');
 const { assumeCustomerRole } = require('../services/awsService');
-const { findUnattachedVolumes, findIdleIPs } = require('../services/scannerService');
+const {
+    findUnattachedVolumes,
+    findIdleIPs,
+    findStoppedInstances,
+    findOldSnapshots,
+    findIdleLoadBalancers,
+    findIdleNatGateways,
+    findUnusedSecurityGroups,
+} = require('../services/scannerService');
 
 /**
- * Triggers a scan for a specific cloud account and saves findings to zombie_resources.
+ * Triggers a full scan for a specific cloud account and saves findings to zombie_resources.
+ * Scans for: EBS Volumes, Elastic IPs, EC2 Instances (stopped), EBS Snapshots (old),
+ *            Load Balancers (idle), NAT Gateways (idle), Security Groups (unused)
  */
 exports.runScan = async (req, res) => {
     try {
@@ -21,7 +31,6 @@ exports.runScan = async (req, res) => {
             const oneMonthAgo = new Date();
             oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
             if (new Date(tenant.current_period_start) < oneMonthAgo) {
-                // Reset credits to 5 for new month
                 const updateRes = await db.query(
                     "UPDATE tenants SET scan_credits = 5, current_period_start = NOW() WHERE id = $1 RETURNING *",
                     [tenant_id]
@@ -52,26 +61,50 @@ exports.runScan = async (req, res) => {
             return res.status(400).json({ error: 'No IAM Role ARN found in credentials_json for this account.' });
         }
 
-        console.log(`Assuming role for ${roleArn}...`);
+        console.log(`[Scanner] Assuming role for ${roleArn}...`);
         const credentials = await assumeCustomerRole(roleArn);
+        const region = account.region || 'us-east-1';
 
-        // 3. Run the Scanners
-        console.log('Running Zombie Scanners...');
-        const unattachedVolumes = await findUnattachedVolumes(credentials, account.region || 'us-east-1');
-        const idleIPs = await findIdleIPs(credentials, account.region || 'us-east-1');
+        // 3. Run all scanners concurrently for speed
+        console.log('[Scanner] Running all zombie scanners in parallel...');
+        const [
+            unattachedVolumes,
+            idleIPs,
+            stoppedInstances,
+            oldSnapshots,
+            idleLoadBalancers,
+            idleNatGateways,
+            unusedSecurityGroups,
+        ] = await Promise.allSettled([
+            findUnattachedVolumes(credentials, region),
+            findIdleIPs(credentials, region),
+            findStoppedInstances(credentials, region),
+            findOldSnapshots(credentials, region),
+            findIdleLoadBalancers(credentials, region),
+            findIdleNatGateways(credentials, region),
+            findUnusedSecurityGroups(credentials, region),
+        ]);
 
-        const totalSavings = [
-            ...unattachedVolumes,
-            ...idleIPs
-        ].reduce((sum, z) => sum + (z.estimated_monthly_cost || 0), 0);
+        // Helper to safely extract fulfilled results (don't fail the whole scan if one scanner errors)
+        const safeResult = (result, name) => {
+            if (result.status === 'fulfilled') return result.value;
+            console.error(`[Scanner] ${name} scanner failed:`, result.reason?.message || result.reason);
+            return [];
+        };
+
+        const allZombies = [
+            ...safeResult(unattachedVolumes, 'EBS Volumes'),
+            ...safeResult(idleIPs, 'Elastic IPs'),
+            ...safeResult(stoppedInstances, 'Stopped EC2'),
+            ...safeResult(oldSnapshots, 'Old Snapshots'),
+            ...safeResult(idleLoadBalancers, 'Load Balancers'),
+            ...safeResult(idleNatGateways, 'NAT Gateways'),
+            ...safeResult(unusedSecurityGroups, 'Security Groups'),
+        ].map(zombie => ({ ...zombie, tenant_id, account_id: account.id }));
+
+        const totalSavings = allZombies.reduce((sum, z) => sum + (z.estimated_monthly_cost || 0), 0);
 
         // 4. Save results to zombie_resources
-        const allZombies = [...unattachedVolumes, ...idleIPs].map(zombie => ({
-            ...zombie,
-            tenant_id,
-            account_id: account.id
-        }));
-
         let insertedCount = 0;
         if (allZombies.length > 0) {
             for (const zombie of allZombies) {
@@ -84,30 +117,41 @@ exports.runScan = async (req, res) => {
                         zombie.account_id,
                         zombie.external_id,
                         zombie.resource_type,
-                        zombie.region || account.region || 'us-east-1',
+                        zombie.region || region,
                         zombie.status || 'active',
                         zombie.estimated_monthly_cost || 0,
-                        JSON.stringify(zombie.details || {})
+                        JSON.stringify(zombie.details || {}),
                     ]
                 );
                 insertedCount++;
             }
         }
 
-        // --- BILLING DEDUCTION ---
+        // 5. Deduct one scan credit
         await db.query(
             'UPDATE tenants SET scan_credits = scan_credits - 1 WHERE id = $1',
             [tenant_id]
         );
 
+        console.log(`[Scanner] Scan complete. Found ${insertedCount} zombies. Estimated savings: $${totalSavings.toFixed(2)}/mo`);
+
         res.status(200).json({
             message: 'Scan completed successfully!',
             zombies_found: insertedCount,
-            estimated_monthly_savings_usd: totalSavings,
+            estimated_monthly_savings_usd: parseFloat(totalSavings.toFixed(2)),
+            breakdown: {
+                ebs_volumes: safeResult(unattachedVolumes, '').length,
+                elastic_ips: safeResult(idleIPs, '').length,
+                ec2_instances: safeResult(stoppedInstances, '').length,
+                ebs_snapshots: safeResult(oldSnapshots, '').length,
+                load_balancers: safeResult(idleLoadBalancers, '').length,
+                nat_gateways: safeResult(idleNatGateways, '').length,
+                security_groups: safeResult(unusedSecurityGroups, '').length,
+            },
         });
 
     } catch (error) {
-        console.error('Scan Error:', error);
+        console.error('[Scanner] Scan Error:', error);
         res.status(500).json({ error: error.message || 'An error occurred during the scan.' });
     }
 };

@@ -580,3 +580,197 @@
 .pagination-arrows button:hover {
     color: #111827;
 }
+
+/* ── Reap Button ── */
+.reap-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    background-color: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    padding: 0.35rem 0.85rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.18s;
+    white-space: nowrap;
+}
+
+.reap-btn:hover:not(:disabled) {
+    background-color: #dc2626;
+    color: #ffffff;
+    border-color: #dc2626;
+}
+
+.reap-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* ── Reap Confirmation Modal ── */
+.reap-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.15s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.reap-modal {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 460px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+    animation: slideUp 0.2s ease;
+    border-top: 4px solid #dc2626;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.reap-modal-icon {
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 0.75rem;
+}
+
+.reap-modal-title {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #111827;
+    text-align: center;
+    margin: 0 0 0.75rem;
+}
+
+.reap-modal-body {
+    font-size: 0.9rem;
+    color: #4b5563;
+    text-align: center;
+    margin: 0 0 1.25rem;
+    line-height: 1.6;
+}
+
+.reap-modal-resource-box {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.25rem;
+    text-align: center;
+}
+
+.reap-modal-resource-type {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #6b7280;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.35rem;
+}
+
+.reap-modal-resource-id {
+    font-family: monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #111827;
+    word-break: break-all;
+    margin-bottom: 0.35rem;
+}
+
+.reap-modal-resource-meta {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.reap-modal-danger-note {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    font-size: 0.82rem;
+    color: #991b1b;
+    line-height: 1.5;
+    margin-bottom: 1.25rem;
+}
+
+.reap-modal-danger-note code {
+    background: #fee2e2;
+    padding: 0.1rem 0.3rem;
+    border-radius: 3px;
+    font-size: 0.8rem;
+}
+
+.reap-modal-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.reap-modal-cancel {
+    flex: 1;
+    padding: 0.65rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #374151;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.reap-modal-cancel:hover {
+    background: #f3f4f6;
+}
+
+.reap-modal-confirm {
+    flex: 1;
+    padding: 0.65rem;
+    border: none;
+    border-radius: 8px;
+    background: #dc2626;
+    color: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    transition: background 0.15s;
+}
+
+.reap-modal-confirm:hover:not(:disabled) {
+    background: #b91c1c;
+}
+
+.reap-modal-confirm:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
