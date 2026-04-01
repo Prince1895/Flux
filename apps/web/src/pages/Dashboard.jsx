@@ -17,11 +17,17 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
     const [reapingId, setReapingId] = useState(null);
     const [isConnectModalOpen, setIsConnectModalOpen] = useState(false);
+    const [tenantName, setTenantName] = useState('');
+    const [reapTarget, setReapTarget] = useState(null); // zombie to confirm reap for
 
     // Stats
     const [totalZombies, setTotalZombies] = useState(0);
     const [totalSavings, setTotalSavings] = useState(0);
     const [reapedSavings, setReapedSavings] = useState(0);
+
+    // Billing
+    const [scanCredits, setScanCredits] = useState(0);
+    const [tenantPlan, setTenantPlan] = useState('starter');
 
     const fetchZombies = async () => {
         if (!user?.user_metadata?.tenant_id) return;
@@ -39,9 +45,9 @@ const Dashboard = () => {
             data.forEach(z => {
                 if (z.status === 'pending') {
                     active++;
-                    savings += (z.estimated_monthly_cost || 0);
+                    savings += Number(z.estimated_monthly_cost || 0);
                 } else if (z.status === 'reaped') {
-                    recovered += (z.estimated_monthly_cost || 0);
+                    recovered += Number(z.estimated_monthly_cost || 0);
                 }
             });
 
@@ -55,17 +61,38 @@ const Dashboard = () => {
         }
     };
 
+    const fetchBilling = async () => {
+        try {
+            const b = await api.getBillingStatus();
+            setScanCredits(b.scan_credits || 0);
+            setTenantPlan(b.plan || 'starter');
+        } catch (e) {
+            console.error('Failed to fetch billing', e);
+        }
+    };
+
     useEffect(() => {
+<<<<<<< HEAD
         if (user?.user_metadata?.tenant_id) {
             fetchZombies();
         }
     }, [user]);
+=======
+        fetchZombies();
+        if (user?.company_name) setTenantName(user.company_name);
+        fetchBilling();
+    }, []);
+>>>>>>> fix-branch
 
     const handleReap = async (zombieId) => {
         setReapingId(zombieId);
+        setReapTarget(null);
         try {
             await api.reapZombie(zombieId);
-            setTimeout(() => fetchZombies(), 1000);
+            setTimeout(() => {
+                fetchZombies();
+                fetchBilling();
+            }, 1000);
         } catch (err) {
             alert(`Reap Failed: ${err.message || 'Unknown error'}`);
         } finally {
@@ -87,12 +114,12 @@ const Dashboard = () => {
                     <a href="#" className="dash-nav-item active">
                         <LayoutDashboard size={18} /> Overview
                     </a>
-                    <a href="#" className="dash-nav-item">
+                    <Link to="/dashboard/accounts" className="dash-nav-item">
                         <Cloud size={18} /> Cloud Accounts
-                    </a>
-                    <a href="#" className="dash-nav-item">
+                    </Link>
+                    <Link to="/dashboard/automation" className="dash-nav-item">
                         <Zap size={18} /> Automation
-                    </a>
+                    </Link>
                     <a href="#" className="dash-nav-item">
                         <BarChart2 size={18} /> Reports
                     </a>
@@ -106,6 +133,9 @@ const Dashboard = () => {
                     <a href="#" className="dash-nav-item">
                         <Users size={18} /> Team
                     </a>
+                    <Link to="/dashboard/pricing" className="dash-nav-item">
+                        <DollarSign size={18} /> Upgrade Plan
+                    </Link>
                 </nav>
 
                 <div className="dash-sidebar-footer">
@@ -131,8 +161,25 @@ const Dashboard = () => {
 
                 {/* Header */}
                 <header className="dash-header">
-                    <h1>Fleet Command</h1>
-                    <div className="dash-header-actions">
+                    <div>
+                        <h1 style={{ margin: 0, fontSize: '1.5rem' }}>
+                            {user?.user_metadata?.full_name
+                                ? `Hey, ${user.user_metadata.full_name.split(' ')[0]} 👋`
+                                : user?.email?.split('@')[0]
+                                    ? `Hey, ${user.email.split('@')[0]} 👋`
+                                    : 'Fleet Command'}
+                        </h1>
+                        {tenantName && (
+                            <p style={{ margin: '2px 0 0', fontSize: '0.82rem', color: '#6b7280', fontWeight: 400 }}>
+                                {tenantName}'s Fleet Command
+                            </p>
+                        )}
+                    </div>
+                    <div className="dash-header-actions" style={{ alignItems: 'center' }}>
+                        <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', padding: '0.4rem 0.8rem', borderRadius: '20px', fontSize: '0.85rem', display: 'flex', gap: '0.6rem', alignItems: 'center', marginRight: '0.5rem', color: '#374151', fontWeight: 600 }}>
+                            <div style={{ background: tenantPlan === 'starter' ? '#e5e7eb' : '#dcfce7', color: tenantPlan === 'starter' ? '#4b5563' : '#15803d', border: `1px solid ${tenantPlan === 'starter' ? '#d1d5db' : '#bbf7d0'}`, padding: '0.15rem 0.5rem', borderRadius: '6px', fontSize: '0.7rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.02em' }}>{tenantPlan}</div>
+                            <span>{scanCredits} Credits Left</span>
+                        </div>
                         <button className="dash-icon-btn"><Sun size={20} /></button>
                         <button className="dash-icon-btn" style={{ position: 'relative' }}>
                             <Bell size={20} />
@@ -158,7 +205,6 @@ const Dashboard = () => {
                             </div>
                             <div className="dash-metric-value">
                                 {totalZombies}
-                                <span className="dash-metric-trend trend-down">↑ 12%</span>
                             </div>
                             <div className="dash-metric-subtitle">
                                 Resources idle &gt; 30 days
@@ -174,10 +220,10 @@ const Dashboard = () => {
                                 </div>
                             </div>
                             <div className="dash-metric-value">
-                                ${totalSavings.toFixed(2)}
+                                ${Number(totalSavings).toFixed(2)}
                             </div>
-                            <div className="dash-metric-subtitle">
-                                Projected annual waste: ${(totalSavings * 12).toLocaleString()}
+                            <div className="dash-metric-subtitle" style={{ color: 'red' }}>
+                                Projected annual waste: ${(Number(totalSavings) * 12).toLocaleString()}
                             </div>
                         </div>
 
@@ -191,12 +237,7 @@ const Dashboard = () => {
                             <div className="dash-metric-value text-neon" style={{ fontSize: '2.5rem' }}>
                                 ${reapedSavings.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                             </div>
-                            <div className="dash-metric-progress">
-                                <div className="progress-bar-container">
-                                    <div className="progress-bar-fill" style={{ width: '75%' }}></div>
-                                </div>
-                                <span>75% of monthly goal reached</span>
-                            </div>
+
                         </div>
 
                     </div>
@@ -254,11 +295,11 @@ const Dashboard = () => {
                                             <td className="text-secondary">{z.region}</td>
                                             <td>
                                                 <span className="account-badge">
-                                                    {z.cloud_accounts?.account_alias || 'Unknown'}
+                                                    {z.account_alias || 'Unknown'}
                                                 </span>
                                             </td>
                                             <td style={{ fontWeight: 600 }}>
-                                                ${z.estimated_monthly_cost?.toFixed(2)}
+                                                ${Number(z.estimated_monthly_cost || 0).toFixed(2)}
                                             </td>
                                             <td>
                                                 {z.status === 'reaped' ? (
@@ -277,10 +318,15 @@ const Dashboard = () => {
                                             </td>
                                             <td style={{ textAlign: 'right' }}>
                                                 {z.status === 'pending' ? (
-                                                    // In mockup it's just a 3-dot menu or an action. We'll leave the reap button for UX, but stylized, or just 3 dots.
-                                                    // Let's hide the direct "Reap" button behind a subtle dots or keep it if they want to reap. The mockup shows 3 vertical dots.
-                                                    <button className="dash-icon-btn-small" title="Actions" onClick={() => handleReap(z.id)}>
-                                                        {reapingId === z.id ? <RefreshCw size={18} className="spin" /> : <MoreVertical size={18} />}
+                                                    <button
+                                                        className="reap-btn"
+                                                        title="Reap this resource"
+                                                        onClick={() => setReapTarget(z)}
+                                                        disabled={!!reapingId}
+                                                    >
+                                                        {reapingId === z.id
+                                                            ? <RefreshCw size={14} className="spin" />
+                                                            : '⚡ Reap'}
                                                     </button>
                                                 ) : (
                                                     <button className="dash-icon-btn-small" title="Actions">
@@ -307,6 +353,46 @@ const Dashboard = () => {
 
             {isConnectModalOpen && (
                 <ConnectModal onClose={() => setIsConnectModalOpen(false)} />
+            )}
+
+            {/* ── Reap Confirmation Modal ── */}
+            {reapTarget && (
+                <div className="reap-modal-overlay" onClick={() => setReapTarget(null)}>
+                    <div className="reap-modal" onClick={e => e.stopPropagation()}>
+                        <div className="reap-modal-icon">⚠️</div>
+                        <h2 className="reap-modal-title">Permanently Delete Resource?</h2>
+                        <p className="reap-modal-body">
+                            You are about to <strong>permanently delete</strong> the following AWS resource.
+                            This action <strong>cannot be undone</strong>.
+                        </p>
+                        <div className="reap-modal-resource-box">
+                            <div className="reap-modal-resource-type">
+                                {reapTarget.resource_type.replace(/_/g, ' ').toUpperCase()}
+                            </div>
+                            <div className="reap-modal-resource-id">{reapTarget.external_id}</div>
+                            <div className="reap-modal-resource-meta">
+                                {reapTarget.region} &nbsp;•&nbsp; ~${Number(reapTarget.estimated_monthly_cost || 0).toFixed(2)}/mo
+                            </div>
+                        </div>
+                        {reapTarget.resource_type === 'ec2_instance' && (
+                            <p className="reap-modal-danger-note">
+                                🔴 <strong>Warning:</strong> Terminating an EC2 instance will also delete its root EBS volume if <code>DeleteOnTermination</code> is enabled.
+                            </p>
+                        )}
+                        <div className="reap-modal-actions">
+                            <button className="reap-modal-cancel" onClick={() => setReapTarget(null)}>Cancel</button>
+                            <button
+                                className="reap-modal-confirm"
+                                onClick={() => handleReap(reapTarget.id)}
+                                disabled={!!reapingId}
+                            >
+                                {reapingId === reapTarget.id
+                                    ? <><RefreshCw size={14} className="spin" /> Reaping...</>
+                                    : '⚡ Yes, Reap It'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );

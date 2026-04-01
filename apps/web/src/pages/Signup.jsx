@@ -2,7 +2,11 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { Activity, Mail, Lock, User, Github, Shield, Rocket } from 'lucide-react';
+<<<<<<< HEAD
 import { apiClient } from '../lib/api';
+=======
+import GlobeCanvas from '../components/GlobeCanvas';
+>>>>>>> fix-branch
 import '../styles/landing.css';
 
 const GoogleIcon = () => (
@@ -17,7 +21,7 @@ const GoogleIcon = () => (
 
 
 const Signup = () => {
-    // We would use useAuth's signup method if it were defined, but for now we'll simulate.
+    const { signup } = useAuth();
     const navigate = useNavigate();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -30,11 +34,14 @@ const Signup = () => {
         setLoading(true);
         setError('');
 
-        // Provide a simulated path / error if signup backend isn't ready
-        setTimeout(() => {
-            setLoading(false);
+        try {
+            await signup(email, password, name);
             navigate('/login');
-        }, 1000);
+        } catch (err) {
+            setError(err.message || 'Signup failed. Please try again.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleSocialLogin = async (provider) => {
@@ -74,7 +81,7 @@ const Signup = () => {
 
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: '#e0f2e9', color: '#00d65b', padding: '0.3rem 0.8rem', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.05em', marginBottom: '1.5rem' }}>
                         <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#00d65b' }}></div>
-                        FREE 14-DAY TRIAL
+                        5 FREE SCANS
                     </div>
 
                     <h1 style={{ fontSize: '3.2rem', fontWeight: 800, color: '#111827', marginBottom: '0.5rem', lineHeight: 1.1, letterSpacing: '-0.02em' }}>
@@ -177,31 +184,53 @@ const Signup = () => {
                     </div>
                 </div>
 
-                {/* Right Side: Graphic Panel */}
-                <div className="login-visual" style={{ flex: '1', maxWidth: '600px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    <div style={{ position: 'relative', width: '100%', paddingBottom: '100%', borderRadius: '24px', overflow: 'hidden', backgroundImage: 'url(/cloud-3d.png)', backgroundSize: 'cover', backgroundPosition: 'center', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.15)' }}>
+                {/* Right Side: Rotating Globe Panel */}
+                <div style={{
+                    flex: '1',
+                    maxWidth: '560px',
+                    backgroundColor: '#030805',
+                    background: 'radial-gradient(ellipse at 30% 40%, rgba(0,214,91,0.14) 0%, #030805 65%)',
+                    borderRadius: '24px',
+                    position: 'relative',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    overflow: 'hidden',
+                    gap: '1.75rem',
+                    padding: '3rem',
+                    boxShadow: '0 25px 50px -12px rgba(0,0,0,0.35)',
+                    minHeight: '500px',
+                }}>
+                    {/* Outer glow */}
+                    <div style={{
+                        position: 'absolute',
+                        width: '420px', height: '420px',
+                        borderRadius: '50%',
+                        background: 'radial-gradient(circle, rgba(0,214,91,0.09) 0%, transparent 70%)',
+                        pointerEvents: 'none',
+                    }} />
 
-                        {/* Status Badges Overlay */}
-                        <div style={{ position: 'absolute', top: '15%', right: '+5%', background: '#dcfce7', padding: '0.8rem 1.2rem', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '0.8rem', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', animation: 'float 5s ease-in-out infinite' }}>
-                            <div style={{ background: '#bbf7d0', padding: '0.5rem', borderRadius: '50%', color: '#16a34a' }}>
-                                <Rocket size={20} />
-                            </div>
-                            <div>
-                                <div style={{ fontSize: '0.7rem', color: '#4b5563', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Speed Boost</div>
-                                <div style={{ fontSize: '0.95rem', color: '#111827', fontWeight: 800 }}>Optimized</div>
-                            </div>
-                        </div>
+                    {/* Globe */}
+                    <div style={{ position: 'relative', zIndex: 2 }}>
+                        <GlobeCanvas size={600} speed={0.8} />
+                    </div>
 
-                        <div style={{ position: 'absolute', bottom: '15%', left: '5%', background: '#dcfce7', padding: '0.8rem 1.2rem', borderRadius: '16px', display: 'flex', alignItems: 'center', gap: '0.8rem', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', animation: 'float 6s ease-in-out infinite', animationDelay: '1s' }}>
-                            <div style={{ background: '#bbf7d0', padding: '0.5rem', borderRadius: '50%', color: '#16a34a' }}>
-                                <Shield size={20} />
-                            </div>
-                            <div>
-                                <div style={{ fontSize: '0.7rem', color: '#4b5563', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Security Status</div>
-                                <div style={{ fontSize: '0.95rem', color: '#111827', fontWeight: 800 }}>Encrypted & Safe</div>
-                            </div>
-                        </div>
+                    {/* Live badge */}
+                    <div style={{
+                        position: 'relative', zIndex: 2,
+                        display: 'inline-flex', alignItems: 'center', gap: '0.5rem',
+                        background: 'rgba(0,214,91,0.1)', border: '1px solid rgba(0,214,91,0.25)',
+                        padding: '0.4rem 1.2rem', borderRadius: '999px',
+                        fontSize: '0.72rem', fontWeight: 700, color: '#00d65b', letterSpacing: '0.1em',
+                    }}>
+                        <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#00d65b', boxShadow: '0 0 8px #00d65b' }} />
+                        LIVE MONITORING ACTIVE
+                    </div>
 
+                    {/* Tagline */}
+                    <div style={{ position: 'relative', zIndex: 2, textAlign: 'center', color: 'rgba(255,255,255,0.45)', fontSize: '0.85rem', maxWidth: '260px', lineHeight: 1.6 }}>
+                        Join thousands of teams reducing cloud waste with Flux
                     </div>
                 </div>
 

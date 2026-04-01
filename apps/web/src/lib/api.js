@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { supabase } from './supabaseClient';
+import { getStoredToken } from '../hooks/useAuth';
 
 // Base API URL from Env or default to local 4000
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
@@ -12,11 +12,11 @@ export const apiClient = axios.create({
     }
 });
 
-// Interceptor to attach the latest Supabase JWT token to every request
-apiClient.interceptors.request.use(async (config) => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session?.access_token) {
-        config.headers.Authorization = `Bearer ${session.access_token}`;
+// Interceptor: attach JWT from localStorage to every request
+apiClient.interceptors.request.use((config) => {
+    const token = getStoredToken();
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
 }, (error) => Promise.reject(error));
@@ -32,10 +32,20 @@ export const api = {
         const res = await apiClient.post('/api/accounts', payload);
         return res.data;
     },
+    deleteAccount: async (accountId) => {
+        const res = await apiClient.delete(`/api/accounts/${accountId}`);
+        return res.data;
+    },
 
     // Scanners
     runScan: async (cloud_account_id) => {
         const res = await apiClient.post('/api/scans/run', { cloud_account_id });
+        return res.data;
+    },
+
+    // Zombie Resources
+    getAllZombies: async () => {
+        const res = await apiClient.get('/api/zombies');
         return res.data;
     },
 
@@ -44,6 +54,7 @@ export const api = {
         const res = await apiClient.post(`/api/reap/${zombieId}`);
         return res.data;
     },
+<<<<<<< HEAD
     getAllZombies: async (tenantId) => {
         // This connects directly to Supabase from the frontend to fetch the user's zombies.
         // We filter by tenant_id to isolate data properly.
@@ -61,4 +72,30 @@ export const api = {
         if (error) throw error;
         return data;
     }
+=======
+
+    // Billing
+    getBillingStatus: async () => {
+        const res = await apiClient.get('/api/billing/status');
+        return res.data;
+    },
+    upgradePlan: async (target_plan) => {
+        const res = await apiClient.post('/api/billing/upgrade', { target_plan });
+        return res.data;
+    },
+
+    // Automation
+    getAutomationSchedules: async () => {
+        const res = await apiClient.get('/api/automation');
+        return res.data;
+    },
+    upsertAutomationSchedule: async (payload) => {
+        const res = await apiClient.post('/api/automation', payload);
+        return res.data;
+    },
+    toggleAutomationSchedule: async (id) => {
+        const res = await apiClient.patch(`/api/automation/${id}/toggle`);
+        return res.data;
+    },
+>>>>>>> fix-branch
 };

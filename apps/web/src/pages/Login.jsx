@@ -2,7 +2,11 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { Activity, Mail, Lock, Github } from 'lucide-react';
+<<<<<<< HEAD
 import { apiClient } from '../lib/api';
+=======
+import GlobeCanvas from '../components/GlobeCanvas';
+>>>>>>> fix-branch
 import '../styles/landing.css';
 
 const GoogleIcon = () => (
@@ -136,7 +140,7 @@ const Login = () => {
                         </div>
 
                         <div style={{ textAlign: 'center', marginTop: '2.5rem', fontSize: '0.9rem', color: '#6b7280' }}>
-                            Not a member yet? <Link to="/signup" style={{ color: '#00d65b', fontWeight: 600, textDecoration: 'none' }}>Start a 14 day free trial</Link>
+                            Not a member yet? <Link to="/signup" style={{ color: '#00d65b', fontWeight: 600, textDecoration: 'none' }}>Join a Starter Plan</Link>
                         </div>
 
                     </div>
@@ -145,10 +149,20 @@ const Login = () => {
                 </div>
             </div>
 
-            {/* Right Side: Split Screen Visual */}
-            <div className="login-visual" style={{ flex: 1, backgroundColor: '#030805', backgroundImage: 'radial-gradient(circle at 0% 50%, rgba(0, 214, 91, 0.12) 0%, #030805 70%)', position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '5rem', color: '#fff', overflow: 'hidden' }}>
-
-                {/* Abstract wavy lines background */}
+            {/* Right Side: Original background + transparent globe overlay */}
+            <div className="login-visual" style={{
+                flex: 1,
+                backgroundColor: '#030805',
+                backgroundImage: 'radial-gradient(circle at 0% 50%, rgba(0, 214, 91, 0.12) 0%, #030805 70%)',
+                position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'flex-end',
+                padding: '5rem',
+                color: '#fff',
+                overflow: 'hidden',
+            }}>
+                {/* Original wavy lines background */}
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.8, zIndex: 0 }}>
                     <svg width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg">
                         <path d="M-100,500 C150,300 350,600 1100,400 L1100,1100 L-100,1100 Z" fill="rgba(0, 214, 91, 0.03)" />
@@ -159,13 +173,24 @@ const Login = () => {
                     </svg>
                 </div>
 
-                <div style={{ position: 'relative', zIndex: 10, maxWidth: '600px' }}>
+                {/* Globe — centered transparent overlay */}
+                <div style={{
+                    position: 'absolute',
+                    top: '50%', left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    zIndex: 1,
+                    opacity: 0.85,
+                }}>
+                    <GlobeCanvas size={1200} speed={0.7} />
+                </div>
+
+                {/* Badge — bottom left, above globe */}
+                <div style={{ position: 'relative', zIndex: 2, maxWidth: '600px' }}>
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(0, 214, 91, 0.1)', border: '1px solid rgba(0, 214, 91, 0.2)', padding: '0.4rem 1rem', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 600, color: '#00d65b', letterSpacing: '0.05em', marginBottom: '1.5rem' }}>
                         <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#00d65b', boxShadow: '0 0 8px #00d65b' }}></div>
                         SYSTEM OPERATIONAL
                     </div>
                 </div>
-
             </div>
         </div>
     );

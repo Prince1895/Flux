@@ -618,3 +618,13 @@
     background-color: #f3f4f6 !important;
     border-color: #d1d5db !important;
 }
+
+/* Pricing Card Hover Effects */
+.pricing-card {
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease !important;
+}
+
+.pricing-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.12) !important;
+}

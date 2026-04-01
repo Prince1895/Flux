@@ -1,0 +1,28 @@
+* [33m0aed866[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfix-branch[m[33m)[m feat: add git commit history log file to project root
+* [33mcf437a0[m[33m ([m[1;31morigin/fix-branch[m[33m)[m fix: correct comment formatting in signup function for clarity
+* [33md86abd4[m feat: implement automation dashboard with scheduling controls and styling
+* [33m12c9ae0[m feat: implement automated cloud resource scanning schedules with email reporting functionality
+* [33m3423d0e[m feat: expand scanner to support multiple resource types and implement parallel execution for improved performance
+* [33mbd6fc55[m feat: add documentation page and expand cloud resource cleanup capabilities with new AWS SDK clients
+* [33mc013107[m feat: add billing columns to tenants table and implement manual/boot-time migration scripts with connection string sanitization
+* [33m7b71b58[m feat: implement billing system with tenant plan management and pricing page
+* [33m6ae0c3f[m refactor: Migrate from Supabase to a custom backend, implementing new authentication and zombie resource management.
+* [33mde86ad0[m feat: add rotating 3D globe visual to login and signup pages
+* [33m5aab706[m feat: Enable user signup, personalize dashboard header with tenant name, and enhance AWS connection modal with detailed instructions.
+[31m|[m * [33m4a3975b[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m)[m feat: Automatically provision a tenant and sync user profile on login for multi-tenancy.
+[31m|[m * [33m54e055e[m feat: implement Google and GitHub social login for signup and login pages, and update home page links and text.
+[31m|[m[31m/[m  
+* [33m343e408[m feat: Implement new dashboard UI with dedicated styling, cloud provider icons, and a connection modal component.
+* [33m7aa2d72[m feat: Introduce signup page and revamp login experience with new Flux branding and social authentication.
+* [33m9e703de[m feat: Migrate web application from Next.js to Vite, introducing core React components, Supabase integration, and initial authentication flows.
+* [33m804e014[m feat: Implement AWS resource reaping API for deleting identified zombie resources.
+* [33m7a7c4ba[m feat: Implement cloud account management API with dedicated controller and routes, refactoring the existing inline account fetching logic.
+* [33me66fb75[m feat: Update tenant ID access from `app_metadata` to `user_metadata` and configure `NODE_OPTIONS` for the dev script.
+* [33ma11dff6[m feat: Implement AWS zombie resource scanning by assuming customer roles and storing findings for unattached EBS volumes and idle Elastic IPs.
+* [33m27c53f9[m authentication worked properly
+* [33m9007a6d[m pass authmiddleware
+* [33m1f87ef3[m pass authmiddleware
+* [33m32efdea[m authentication using supabase
+* [33m63211bf[m architecture of db
+* [33m8303fba[m Database design
+* [33mc5c477d[m Initial commit from create-turbo
