@@ -54,26 +54,6 @@ export const api = {
         const res = await apiClient.post(`/api/reap/${zombieId}`);
         return res.data;
     },
-<<<<<<< HEAD
-    getAllZombies: async (tenantId) => {
-        // This connects directly to Supabase from the frontend to fetch the user's zombies.
-        // We filter by tenant_id to isolate data properly.
-        let query = supabase
-            .from('zombie_resources')
-            .select('*, cloud_accounts(account_alias)')
-            .order('detected_at', { ascending: false });
-
-        if (tenantId) {
-            query = query.eq('tenant_id', tenantId);
-        }
-
-        const { data, error } = await query;
-
-        if (error) throw error;
-        return data;
-    }
-=======
-
     // Billing
     getBillingStatus: async () => {
         const res = await apiClient.get('/api/billing/status');
@@ -97,5 +77,14 @@ export const api = {
         const res = await apiClient.patch(`/api/automation/${id}/toggle`);
         return res.data;
     },
->>>>>>> fix-branch
+
+    // Reports
+    getReportSummary: async () => {
+        const res = await apiClient.get('/api/reports/summary');
+        return res.data;
+    },
+    sendManualReport: async (account_id) => {
+        const res = await apiClient.post('/api/reports/send', { account_id });
+        return res.data;
+    }
 };

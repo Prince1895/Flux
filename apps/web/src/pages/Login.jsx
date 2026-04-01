@@ -2,11 +2,8 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { Activity, Mail, Lock, Github } from 'lucide-react';
-<<<<<<< HEAD
 import { apiClient } from '../lib/api';
-=======
 import GlobeCanvas from '../components/GlobeCanvas';
->>>>>>> fix-branch
 import '../styles/landing.css';
 
 const GoogleIcon = () => (
@@ -43,17 +40,7 @@ const Login = () => {
         }
     };
 
-    const handleSocialLogin = async (provider) => {
-        setLoading(true);
-        setError('');
-        try {
-            const res = await apiClient.get(`/api/auth/${provider}?redirectTo=${window.location.origin}/dashboard`);
-            window.location.href = res.data.url;
-        } catch (err) {
-            setError(`Failed to authenticate with ${provider}`);
-            setLoading(false);
-        }
-    };
+
 
     return (
         <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#ffffff', fontFamily: '"Inter", sans-serif' }}>
@@ -124,20 +111,7 @@ const Login = () => {
                             </button>
                         </form>
 
-                        <div style={{ display: 'flex', alignItems: 'center', margin: '2rem 0' }}>
-                            <div style={{ flex: 1, height: '1px', backgroundColor: '#e5e7eb' }}></div>
-                            <span style={{ padding: '0 1rem', fontSize: '0.85rem', color: '#6b7280' }}>Or continue with</span>
-                            <div style={{ flex: 1, height: '1px', backgroundColor: '#e5e7eb' }}></div>
-                        </div>
 
-                        <div style={{ display: 'flex', gap: '1rem' }}>
-                            <button type="button" onClick={() => handleSocialLogin('google')} disabled={loading} className="auth-social-btn" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem', padding: '0.7rem', backgroundColor: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 600, color: '#374151', cursor: 'pointer', transition: 'background 0.2s' }}>
-                                <GoogleIcon /> Google
-                            </button>
-                            <button type="button" onClick={() => handleSocialLogin('github')} disabled={loading} className="auth-social-btn" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem', padding: '0.7rem', backgroundColor: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '8px', fontSize: '0.9rem', fontWeight: 600, color: '#374151', cursor: 'pointer', transition: 'background 0.2s' }}>
-                                <Github size={18} color="#111827" /> GitHub
-                            </button>
-                        </div>
 
                         <div style={{ textAlign: 'center', marginTop: '2.5rem', fontSize: '0.9rem', color: '#6b7280' }}>
                             Not a member yet? <Link to="/signup" style={{ color: '#00d65b', fontWeight: 600, textDecoration: 'none' }}>Join a Starter Plan</Link>

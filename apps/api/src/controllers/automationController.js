@@ -8,7 +8,7 @@ exports.getSchedules = async (req, res) => {
     try {
         const tenant_id = req.user.tenant_id;
         const result = await db.query(
-            `SELECT s.*, ca.name AS account_name, ca.region AS account_region
+            `SELECT s.*, ca.account_alias AS account_name, ca.region AS account_region
              FROM automation_schedules s
              JOIN cloud_accounts ca ON s.account_id = ca.id
              WHERE s.tenant_id = $1

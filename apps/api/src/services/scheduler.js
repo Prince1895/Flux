@@ -5,7 +5,7 @@ const {
     findUnattachedVolumes, findIdleIPs, findStoppedInstances,
     findOldSnapshots, findIdleLoadBalancers, findIdleNatGateways, findUnusedSecurityGroups,
 } = require('./scannerService');
-const { sendScanReport } = require('./emailService');
+const { sendScanReport, processEmailQueue } = require('./emailService');
 
 // Map of scheduleId -> cron.ScheduledTask
 const activeTasks = new Map();
@@ -147,7 +147,7 @@ const reloadSchedule = async (schedule) => {
 const startScheduler = async () => {
     try {
         const result = await db.query(
-            `SELECT s.*, ca.name AS account_name
+            `SELECT s.*, ca.account_alias AS account_name
              FROM automation_schedules s
              JOIN cloud_accounts ca ON s.account_id = ca.id
              WHERE s.enabled = true`
@@ -156,6 +156,13 @@ const startScheduler = async () => {
         for (const schedule of result.rows) {
             await reloadSchedule(schedule);
         }
+
+        // Start Email Queue Processor (Runs every 1 minute)
+        cron.schedule('* * * * *', async () => {
+            await processEmailQueue();
+        }, { scheduled: true, timezone: 'UTC' });
+        console.log('[Scheduler] Started local Email Queue Worker.');
+
     } catch (err) {
         console.error('[Scheduler] Failed to start scheduler:', err.message);
     }

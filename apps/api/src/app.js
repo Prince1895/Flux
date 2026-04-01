@@ -10,6 +10,8 @@ const billingRoutes = require('./routes/billingRoutes');
 const automationRoutes = require('./routes/automationRoutes');
 const db = require('./config/db');
 
+const reportRoutes = require('./routes/reportRoutes');
+
 const app = express();
 
 app.use(cors());
@@ -22,6 +24,7 @@ app.use('/api/reap', verifyJWT, reapRoutes);
 app.use('/api/zombies', verifyJWT, zombieRoutes);
 app.use('/api/billing', verifyJWT, billingRoutes);
 app.use('/api/automation', verifyJWT, automationRoutes);
+app.use('/api/reports', verifyJWT, reportRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'flux API running' });

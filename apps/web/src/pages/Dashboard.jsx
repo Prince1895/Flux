@@ -72,17 +72,10 @@ const Dashboard = () => {
     };
 
     useEffect(() => {
-<<<<<<< HEAD
-        if (user?.user_metadata?.tenant_id) {
-            fetchZombies();
-        }
-    }, [user]);
-=======
         fetchZombies();
         if (user?.company_name) setTenantName(user.company_name);
         fetchBilling();
     }, []);
->>>>>>> fix-branch
 
     const handleReap = async (zombieId) => {
         setReapingId(zombieId);
@@ -120,9 +113,9 @@ const Dashboard = () => {
                     <Link to="/dashboard/automation" className="dash-nav-item">
                         <Zap size={18} /> Automation
                     </Link>
-                    <a href="#" className="dash-nav-item">
+                    <Link to="/dashboard/reports" className="dash-nav-item">
                         <BarChart2 size={18} /> Reports
-                    </a>
+                    </Link>
                 </nav>
 
                 <div className="dash-nav-label">SYSTEM</div>

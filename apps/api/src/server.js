@@ -31,6 +31,20 @@ app.listen(PORT, async () => {
       );
     `);
 
+    // Email Queue table
+    await db.query(`
+      CREATE TABLE IF NOT EXISTS email_queue (
+        id SERIAL PRIMARY KEY,
+        to_email TEXT NOT NULL,
+        subject TEXT NOT NULL,
+        html_content TEXT NOT NULL,
+        status TEXT DEFAULT 'pending',
+        attempts INT DEFAULT 0,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        sent_at TIMESTAMPTZ
+      );
+    `);
+
     console.log('✅ Migrations applied successfully.');
   } catch (e) {
     console.error('❌ Boot-time migration failed:', e);

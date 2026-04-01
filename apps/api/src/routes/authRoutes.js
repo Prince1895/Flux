@@ -4,8 +4,5 @@ const authController = require('../controllers/authController.js');
 
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);
-router.get('/google', authController.googleLogin);
-router.get('/github', authController.githubLogin);
-router.post('/sync', authController.syncProfile);
 
 module.exports = router;

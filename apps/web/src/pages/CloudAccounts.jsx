@@ -88,8 +88,10 @@ const CloudAccounts = () => {
                 <nav className="dash-nav-group">
                     <Link to="/dashboard" className="dash-nav-item"><LayoutDashboard size={18} /> Overview</Link>
                     <Link to="/dashboard/accounts" className="dash-nav-item active"><Cloud size={18} /> Cloud Accounts</Link>
-                    <a href="#" className="dash-nav-item"><Zap size={18} /> Automation</a>
-                    <a href="#" className="dash-nav-item"><BarChart2 size={18} /> Reports</a>
+                    <a href="/dashboard/automation" className="dash-nav-item"><Zap size={18} /> Automation</a>
+                    <Link to="/dashboard/reports" className="dash-nav-item">
+                        <BarChart2 size={18} /> Reports
+                    </Link>
                 </nav>
                 <div className="dash-nav-label">SYSTEM</div>
                 <nav className="dash-nav-group">

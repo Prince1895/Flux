@@ -133,9 +133,9 @@ const Automation = () => {
                     <Link to="/dashboard/automation" className="dash-nav-item active">
                         <Zap size={18} /> Automation
                     </Link>
-                    <a href="#" className="dash-nav-item">
+                    <Link to="/dashboard/reports" className="dash-nav-item">
                         <BarChart2 size={18} /> Reports
-                    </a>
+                    </Link>
                 </nav>
                 <div className="dash-nav-label">SYSTEM</div>
                 <nav className="dash-nav-group">

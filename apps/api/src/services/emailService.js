@@ -1,4 +1,5 @@
 const nodemailer = require('nodemailer');
+const db = require('../config/db');
 
 const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
@@ -156,14 +157,61 @@ const sendScanReport = async (to, summary, zombies = []) => {
 </body>
 </html>`;
 
-    await transporter.sendMail({
-        from: process.env.SMTP_FROM || '"GreenOps Reaper" <noreply@greenops.io>',
-        to,
-        subject: `⚡ Scan Report: ${zombies_found} zombie${zombies_found !== 1 ? 's' : ''} found in ${accountName} — ${savingsFormatted}/mo wasted`,
-        html,
-    });
-
-    console.log(`[Email] Scan report sent to ${to}`);
+    const subject = `⚡ Scan Report: ${zombies_found} zombie${zombies_found !== 1 ? 's' : ''} found in ${accountName} — ${savingsFormatted}/mo wasted`;
+    await queueEmail(to, subject, html);
 };
 
-module.exports = { sendScanReport };
+/**
+ * Inserts an email into the DB queue.
+ */
+const queueEmail = async (to_email, subject, html_content) => {
+    try {
+        await db.query(
+            'INSERT INTO email_queue (to_email, subject, html_content) VALUES ($1, $2, $3)',
+            [to_email, subject, html_content]
+        );
+        console.log(`[EmailQueue] Queued email to ${to_email}`);
+    } catch (err) {
+        console.error('[EmailQueue] Failed to queue email:', err);
+    }
+};
+
+/**
+ * Processes pending emails from the DB queue.
+ */
+const processEmailQueue = async () => {
+    try {
+        // Grab up to 10 pending emails
+        const pending = await db.query(
+            "SELECT id, to_email, subject, html_content, attempts FROM email_queue WHERE status = 'pending' LIMIT 10"
+        );
+
+        for (const job of pending.rows) {
+            try {
+                // Mark as processing
+                await db.query("UPDATE email_queue SET status = 'processing', attempts = attempts + 1 WHERE id = $1", [job.id]);
+
+                // Send email
+                await transporter.sendMail({
+                    from: process.env.SMTP_FROM || '"GreenOps Reaper" <noreply@greenops.io>',
+                    to: job.to_email,
+                    subject: job.subject,
+                    html: job.html_content,
+                });
+
+                // Mark successful
+                await db.query("UPDATE email_queue SET status = 'sent', sent_at = NOW() WHERE id = $1", [job.id]);
+                console.log(`[EmailQueue] Sent and cleared job ${job.id} to ${job.to_email}`);
+            } catch (sendErr) {
+                console.error(`[EmailQueue] Job ${job.id} failed:`, sendErr);
+                // Mark failed or pending if retries remain
+                const newStatus = job.attempts >= 2 ? 'failed' : 'pending';
+                await db.query("UPDATE email_queue SET status = $1 WHERE id = $2", [newStatus, job.id]);
+            }
+        }
+    } catch (err) {
+        console.error('[EmailQueue] Worker error:', err);
+    }
+};
+
+module.exports = { sendScanReport, queueEmail, processEmailQueue };

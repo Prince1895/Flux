@@ -2,11 +2,8 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { Activity, Mail, Lock, User, Github, Shield, Rocket } from 'lucide-react';
-<<<<<<< HEAD
 import { apiClient } from '../lib/api';
-=======
 import GlobeCanvas from '../components/GlobeCanvas';
->>>>>>> fix-branch
 import '../styles/landing.css';
 
 const GoogleIcon = () => (
@@ -44,17 +41,7 @@ const Signup = () => {
         }
     };
 
-    const handleSocialLogin = async (provider) => {
-        setLoading(true);
-        setError('');
-        try {
-            const res = await apiClient.get(`/api/auth/${provider}?redirectTo=${window.location.origin}/dashboard`);
-            window.location.href = res.data.url;
-        } catch (err) {
-            setError(`Failed to authenticate with ${provider}`);
-            setLoading(false);
-        }
-    };
+
 
     return (
         <div style={{ minHeight: '100vh', backgroundColor: '#f4f7f6', fontFamily: '"Inter", sans-serif', padding: '1rem', display: 'flex', flexDirection: 'column' }}>
@@ -164,20 +151,7 @@ const Signup = () => {
                         By clicking "Create Account", you agree to our <a href="#" style={{ color: '#6b7280', textDecoration: 'underline' }}>Terms of Service</a> and <a href="#" style={{ color: '#6b7280', textDecoration: 'underline' }}>Privacy Policy</a>.
                     </div>
 
-                    <div style={{ display: 'flex', alignItems: 'center', margin: '2rem 0' }}>
-                        <div style={{ flex: 1, height: '1px', backgroundColor: '#e5e7eb' }}></div>
-                        <span style={{ padding: '0 1rem', fontSize: '0.85rem', color: '#6b7280' }}>Or continue with</span>
-                        <div style={{ flex: 1, height: '1px', backgroundColor: '#e5e7eb' }}></div>
-                    </div>
 
-                    <div style={{ display: 'flex', gap: '1rem' }}>
-                        <button type="button" onClick={() => handleSocialLogin('google')} disabled={loading} className="auth-social-btn" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem', padding: '0.8rem', backgroundColor: '#ffffff', border: 'none', boxShadow: '0 2px 10px rgba(0,0,0,0.02)', borderRadius: '40px', fontSize: '0.9rem', fontWeight: 600, color: '#374151', cursor: 'pointer', transition: 'background 0.2s' }}>
-                            <GoogleIcon /> Google
-                        </button>
-                        <button type="button" onClick={() => handleSocialLogin('github')} disabled={loading} className="auth-social-btn" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem', padding: '0.8rem', backgroundColor: '#ffffff', border: 'none', boxShadow: '0 2px 10px rgba(0,0,0,0.02)', borderRadius: '40px', fontSize: '0.9rem', fontWeight: 600, color: '#374151', cursor: 'pointer', transition: 'background 0.2s' }}>
-                            <Github size={18} color="#111827" /> GitHub
-                        </button>
-                    </div>
 
                     <div style={{ textAlign: 'center', marginTop: '2.5rem', fontSize: '0.95rem', color: '#4b5563' }}>
                         Already have an account? <Link to="/login" style={{ color: '#111827', fontWeight: 700, textDecoration: 'none' }}>Log in</Link>
