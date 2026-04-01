@@ -17,7 +17,7 @@ exports.signup = async (req, res) => {
         );
         const tenant = tenantResult.rows[0];
 
-        // 2. Hash password and create user
+        // 2. Hash password and create user 
         const password_hash = await bcrypt.hash(password, 12);
         const userResult = await db.query(
             'INSERT INTO users (tenant_id, email, password_hash, role) VALUES ($1, $2, $3, $4) RETURNING id, email, tenant_id, role',
