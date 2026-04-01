@@ -1,10 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Activity, Play, ArrowRight, Trash2, TrendingUp, LineChart, X, Network, BarChart3, SlidersHorizontal, CheckCircle2, Zap } from 'lucide-react';
 import '../styles/landing.css';
 
 const Home = () => {
     const [activeModal, setActiveModal] = useState(null);
+    const [userCount, setUserCount] = useState(0);
+
+    useEffect(() => {
+        fetch('http://localhost:4000/api/public/stats')
+            .then(res => res.json())
+            .then(data => setUserCount(data.users))
+            .catch(err => console.error('Failed to fetch stats:', err));
+    }, []);
 
     const modalData = {
         reaper: {
@@ -48,8 +56,7 @@ const Home = () => {
                 <div className="landing-nav-links">
                     <a href="#features">Features</a>
                     <a href="#pricing">Pricing</a>
-                    <a href="#enterprise">Enterprise</a>
-                    <a href="#docs">Docs</a>
+                    <a href="/docs">Docs</a>
                 </div>
                 <div style={{ flex: 1, display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
                     <Link to="/login" className="landing-btn-login">Login</Link>
@@ -416,7 +423,7 @@ const Home = () => {
                     <div>
                         <h4>Resources</h4>
                         <ul>
-                            <li><a href="#">Documentation</a></li>
+                            <li><a href="/docs">Documentation</a></li>
                             <li><a href="#">API Reference</a></li>
                             <li><a href="#">Blog</a></li>
                         </ul>
@@ -426,26 +433,17 @@ const Home = () => {
                         <h4>Company</h4>
                         <ul>
                             <li><a href="#">About Us</a></li>
-                            <li><a href="#">Careers</a></li>
                             <li><a href="#">Contact</a></li>
                         </ul>
-                    </div>
-
-                    <div>
-                        <h4>Newsletter</h4>
-                        <p style={{ color: '#6b7280', fontSize: '0.85rem', marginBottom: '0.5rem' }}>Get the latest on cloud optimization.</p>
-                        <div className="newsletter-input">
-                            <input type="email" placeholder="Email" />
-                            <button><ArrowRight size={16} /></button>
-                        </div>
                     </div>
                 </div>
 
                 <div className="footer-bottom">
-                    <div>© 2026 Flux Inc. All rights reserved.</div>
-                    <div className="footer-bottom-links">
-                        <a href="#" style={{ color: '#9ca3af', textDecoration: 'none' }}>Privacy Policy</a>
-                        <a href="#" style={{ color: '#9ca3af', textDecoration: 'none' }}>Terms of Service</a>
+                    <div>
+                        © 2026 Flux Inc. All rights reserved.
+                        <span style={{ marginLeft: '1rem', color: '#00d65b', fontWeight: 600 }}>
+                            • Trusted by {userCount > 0 ? userCount : '10+'} registered users
+                        </span>
                     </div>
                 </div>
             </footer>

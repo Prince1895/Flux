@@ -1,6 +1,14 @@
 const db = require('../config/db');
 const { assumeCustomerRole } = require('../services/awsService');
-const { deleteEbsVolume, releaseElasticIp } = require('../services/reaperService');
+const {
+    deleteEbsVolume,
+    releaseElasticIp,
+    terminateInstance,
+    deleteSnapshot,
+    deleteLoadBalancer,
+    deleteNatGateway,
+    deleteSecurityGroup,
+} = require('../services/reaperService');
 
 exports.executeReap = async (req, res) => {
     try {
@@ -44,14 +52,44 @@ exports.executeReap = async (req, res) => {
 
         console.log(`[Reaper] Terminating ${zombie.resource_type} -> ${zombie.external_id}`);
 
-        if (zombie.resource_type === 'ebs_volume') {
-            await deleteEbsVolume(credentials, region, zombie.external_id);
-            actionMessage = `Deleted EBS Volume: ${zombie.external_id}`;
-        } else if (zombie.resource_type === 'elastic_ip') {
-            await releaseElasticIp(credentials, region, zombie.external_id);
-            actionMessage = `Released Elastic IP: ${zombie.external_id}`;
-        } else {
-            return res.status(400).json({ error: `Unsupported resource type: ${zombie.resource_type}` });
+        switch (zombie.resource_type) {
+            case 'ebs_volume':
+                await deleteEbsVolume(credentials, region, zombie.external_id);
+                actionMessage = `Deleted EBS Volume: ${zombie.external_id}`;
+                break;
+
+            case 'elastic_ip':
+                await releaseElasticIp(credentials, region, zombie.external_id);
+                actionMessage = `Released Elastic IP: ${zombie.external_id}`;
+                break;
+
+            case 'ec2_instance':
+                await terminateInstance(credentials, region, zombie.external_id);
+                actionMessage = `Terminated EC2 Instance: ${zombie.external_id}`;
+                break;
+
+            case 'ebs_snapshot':
+                await deleteSnapshot(credentials, region, zombie.external_id);
+                actionMessage = `Deleted EBS Snapshot: ${zombie.external_id}`;
+                break;
+
+            case 'load_balancer':
+                await deleteLoadBalancer(credentials, region, zombie.external_id);
+                actionMessage = `Deleted Load Balancer: ${zombie.external_id}`;
+                break;
+
+            case 'nat_gateway':
+                await deleteNatGateway(credentials, region, zombie.external_id);
+                actionMessage = `Deleted NAT Gateway: ${zombie.external_id}`;
+                break;
+
+            case 'security_group':
+                await deleteSecurityGroup(credentials, region, zombie.external_id);
+                actionMessage = `Deleted Security Group: ${zombie.external_id}`;
+                break;
+
+            default:
+                return res.status(400).json({ error: `Unsupported resource type: ${zombie.resource_type}` });
         }
 
         // 5. Update zombie status
@@ -75,7 +113,7 @@ exports.executeReap = async (req, res) => {
         res.status(200).json({
             message: 'Resource permanently deleted from AWS!',
             action: actionMessage,
-            savings_recovered_usd: zombie.estimated_monthly_cost
+            savings_recovered_usd: zombie.estimated_monthly_cost,
         });
 
     } catch (error) {

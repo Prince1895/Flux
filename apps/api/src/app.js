@@ -6,8 +6,8 @@ const accountRoutes = require('./routes/accountRoutes');
 const reapRoutes = require('./routes/reapRoutes');
 const zombieRoutes = require('./routes/zombieRoutes');
 const { verifyJWT } = require('./middlewares/authMiddleware.js');
-
 const billingRoutes = require('./routes/billingRoutes');
+const db = require('./config/db');
 
 const app = express();
 
@@ -23,6 +23,16 @@ app.use('/api/billing', verifyJWT, billingRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'flux API running' });
+});
+
+app.get('/api/public/stats', async (req, res) => {
+  try {
+    const result = await db.query('SELECT COUNT(*) AS count FROM users');
+    res.json({ users: parseInt(result.rows[0].count, 10) });
+  } catch (err) {
+    console.error('Failed to fetch stats:', err);
+    res.status(500).json({ users: 0 });
+  }
 });
 
 module.exports = app;

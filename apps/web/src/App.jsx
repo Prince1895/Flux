@@ -7,6 +7,7 @@ import Connect from './pages/Connect';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Pricing from './pages/Pricing';
+import Docs from './pages/Docs';
 import './styles/globals.css';
 
 // Protected Route Wrapper
@@ -24,6 +25,8 @@ const AppRouter = () => {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
+      <Route path="/pricing" element={<Pricing />} />
+      <Route path="/docs" element={<Docs />} />
       <Route
         path="/dashboard"
         element={
