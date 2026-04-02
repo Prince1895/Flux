@@ -30,12 +30,10 @@ const Dashboard = () => {
     const [tenantPlan, setTenantPlan] = useState('starter');
 
     const fetchZombies = async () => {
-        if (!user?.user_metadata?.tenant_id) return;
+        if (!user?.tenant_id) return;
         setLoading(true);
         try {
-            const data = await api.getAllZombies(user.user_metadata.tenant_id);
-            // To match the mockup visually while loading real data, user might want fake mock data if db is empty.
-            // But let's use the real data from DB, we just format it beautifully.
+            const data = await api.getAllZombies(); // No need to pass tenant_id, auth token has it
             setZombies(data);
 
             let active = 0;
@@ -156,8 +154,8 @@ const Dashboard = () => {
                 <header className="dash-header">
                     <div>
                         <h1 style={{ margin: 0, fontSize: '1.5rem' }}>
-                            {user?.user_metadata?.full_name
-                                ? `Hey, ${user.user_metadata.full_name.split(' ')[0]} 👋`
+                            {user?.company_name
+                                ? `Hey, ${user.company_name.split(' ')[0]} 👋`
                                 : user?.email?.split('@')[0]
                                     ? `Hey, ${user.email.split('@')[0]} 👋`
                                     : 'Fleet Command'}
