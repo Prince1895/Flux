@@ -9,6 +9,8 @@ const transporter = nodemailer.createTransport({
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
+  // Force IPv4 to avoid ENETUNREACH on IPv6-only resolution in restricted networks
+  family: 4,
 });
 
 // Verify connection on startup
