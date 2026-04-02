@@ -14,7 +14,8 @@ import './styles/globals.css';
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  if (loading) return null; // wait until session is restored from localStorage
   if (!user) {
     return <Navigate to="/" replace />;
   }
