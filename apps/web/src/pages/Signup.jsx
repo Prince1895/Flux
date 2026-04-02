@@ -6,6 +6,8 @@ import { apiClient } from '../lib/api';
 import GlobeCanvas from '../components/GlobeCanvas';
 import '../styles/landing.css';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4000';
+
 const GoogleIcon = () => (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -81,13 +83,13 @@ const Signup = () => {
                     {/* OAuth Signup Buttons */}
                     <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
                         <button
-                            onClick={() => window.location.href = 'http://localhost:4000/api/auth/google'}
+                            onClick={() => window.location.href = `${API_BASE_URL}/api/auth/google`}
                             type="button"
                             style={{ flex: 1, padding: '0.85rem', background: '#fff', border: '1px solid #d1d5db', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem', fontSize: '0.95rem', fontWeight: 600, cursor: 'pointer', boxShadow: '0 2px 5px rgba(0,0,0,0.02)', color: '#374151', transition: 'background 0.2s' }}>
                             <GoogleIcon /> Google
                         </button>
                         <button
-                            onClick={() => window.location.href = 'http://localhost:4000/api/auth/github'}
+                            onClick={() => window.location.href = `${API_BASE_URL}/api/auth/github`}
                             type="button"
                             style={{ flex: 1, padding: '0.85rem', background: '#111827', border: '1px solid #111827', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem', fontSize: '0.95rem', fontWeight: 600, cursor: 'pointer', boxShadow: '0 2px 5px rgba(0,0,0,0.05)', color: '#fff', transition: 'background 0.2s' }}>
                             <Github size={18} /> GitHub

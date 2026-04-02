@@ -5,6 +5,19 @@ exports.addAccount = async (req, res) => {
         const { name, provider, credentials_json, region } = req.body;
         const tenant_id = req.user.tenant_id;
 
+        // Prevent adding the same AWS account (role_arn) twice for the same tenant
+        if (credentials_json?.role_arn) {
+            const existing = await db.query(
+                `SELECT id FROM cloud_accounts
+                 WHERE tenant_id = $1
+                   AND credentials_json->>'role_arn' = $2`,
+                [tenant_id, credentials_json.role_arn]
+            );
+            if (existing.rows.length > 0) {
+                return res.status(409).json({ error: 'This AWS account (Role ARN) is already connected.' });
+            }
+        }
+
         const result = await db.query(
             `INSERT INTO cloud_accounts (tenant_id, account_alias, provider, credentials_json, region)
              VALUES ($1, $2, $3, $4, $5)
@@ -18,6 +31,7 @@ exports.addAccount = async (req, res) => {
         res.status(500).json({ error: 'Server error adding account' });
     }
 };
+
 
 exports.getAccounts = async (req, res) => {
     try {
