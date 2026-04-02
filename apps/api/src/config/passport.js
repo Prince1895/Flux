@@ -63,7 +63,7 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
     passport.use(new GoogleStrategy({
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: `${process.env.API_URL || 'http://localhost:4000'}/api/auth/google/callback`,
+        callbackURL: `${process.env.RENDER_EXTERNAL_URL || process.env.API_URL || 'http://localhost:4000'}/api/auth/google/callback`,
         scope: ['profile', 'email']
     }, async (accessToken, refreshToken, profile, done) => {
         try {
@@ -80,7 +80,7 @@ if (process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET) {
     passport.use(new GitHubStrategy({
         clientID: process.env.GITHUB_CLIENT_ID,
         clientSecret: process.env.GITHUB_CLIENT_SECRET,
-        callbackURL: `${process.env.API_URL || 'http://localhost:4000'}/api/auth/github/callback`,
+        callbackURL: `${process.env.RENDER_EXTERNAL_URL || process.env.API_URL || 'http://localhost:4000'}/api/auth/github/callback`,
         scope: ['user:email']
     }, async (accessToken, refreshToken, profile, done) => {
         try {
