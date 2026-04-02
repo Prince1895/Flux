@@ -18,7 +18,7 @@ const Connect = () => {
     {
       "Effect": "Allow",
       "Principal": {
-        "AWS": "arn:aws:iam::YOUR_AWS_ACCOUNT_ID:user/reaper-backend-worker"
+        "AWS": "arn:aws:iam::699475935298:user/backendworker"
       },
       "Action": "sts:AssumeRole"
     }

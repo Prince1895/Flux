@@ -65,42 +65,57 @@ exports.runScan = async (req, res) => {
         const credentials = await assumeCustomerRole(roleArn);
         const region = account.region || 'us-east-1';
 
-        // 3. Run all scanners concurrently for speed
-        console.log('[Scanner] Running all zombie scanners in parallel...');
-        const [
-            unattachedVolumes,
-            idleIPs,
-            stoppedInstances,
-            oldSnapshots,
-            idleLoadBalancers,
-            idleNatGateways,
-            unusedSecurityGroups,
-        ] = await Promise.allSettled([
-            findUnattachedVolumes(credentials, region),
-            findIdleIPs(credentials, region),
-            findStoppedInstances(credentials, region),
-            findOldSnapshots(credentials, region),
-            findIdleLoadBalancers(credentials, region),
-            findIdleNatGateways(credentials, region),
-            findUnusedSecurityGroups(credentials, region),
-        ]);
+        // 3. Discover all available AWS regions for this account
+        const { EC2Client, DescribeRegionsCommand } = require('@aws-sdk/client-ec2');
+        let enabledRegions = [region];
+        try {
+            const ec2Client = new EC2Client({
+                region: 'us-east-1',
+                credentials: {
+                    accessKeyId: credentials.accessKeyId,
+                    secretAccessKey: credentials.secretAccessKey,
+                    sessionToken: credentials.sessionToken,
+                },
+            });
+            const regionRes = await ec2Client.send(new DescribeRegionsCommand({}));
+            enabledRegions = regionRes.Regions.map(r => r.RegionName);
+            console.log(`[Scanner] Found ${enabledRegions.length} enabled regions to scan.`);
+        } catch (e) {
+            console.error('[Scanner] Failed to describe regions, defaulting to', enabledRegions);
+        }
 
-        // Helper to safely extract fulfilled results (don't fail the whole scan if one scanner errors)
-        const safeResult = (result, name) => {
-            if (result.status === 'fulfilled') return result.value;
-            console.error(`[Scanner] ${name} scanner failed:`, result.reason?.message || result.reason);
-            return [];
-        };
+        // 4. Run all scanners concurrently across ALL regions
+        console.log(`[Scanner] Running all zombie scanners across ${enabledRegions.length} regions...`);
 
-        const allZombies = [
-            ...safeResult(unattachedVolumes, 'EBS Volumes'),
-            ...safeResult(idleIPs, 'Elastic IPs'),
-            ...safeResult(stoppedInstances, 'Stopped EC2'),
-            ...safeResult(oldSnapshots, 'Old Snapshots'),
-            ...safeResult(idleLoadBalancers, 'Load Balancers'),
-            ...safeResult(idleNatGateways, 'NAT Gateways'),
-            ...safeResult(unusedSecurityGroups, 'Security Groups'),
-        ].map(zombie => ({ ...zombie, tenant_id, account_id: account.id }));
+        const allZombies = [];
+        const scanPromises = enabledRegions.map(async (r) => {
+            const results = await Promise.allSettled([
+                findUnattachedVolumes(credentials, r),
+                findIdleIPs(credentials, r),
+                findStoppedInstances(credentials, r),
+                findOldSnapshots(credentials, r),
+                findIdleLoadBalancers(credentials, r),
+                findIdleNatGateways(credentials, r),
+                findUnusedSecurityGroups(credentials, r),
+            ]);
+
+            // Helper to safely extract fulfilled results
+            const safeResult = (result) => result.status === 'fulfilled' ? result.value : [];
+
+            const regionZombies = [
+                ...safeResult(results[0]), // unattachedVolumes
+                ...safeResult(results[1]), // idleIPs
+                ...safeResult(results[2]), // stoppedInstances
+                ...safeResult(results[3]), // oldSnapshots
+                ...safeResult(results[4]), // idleLoadBalancers
+                ...safeResult(results[5]), // idleNatGateways
+                ...safeResult(results[6]), // unusedSecurityGroups
+            ].map(zombie => ({ ...zombie, tenant_id, account_id: account.id }));
+
+            allZombies.push(...regionZombies);
+        });
+
+        await Promise.allSettled(scanPromises);
 
         const totalSavings = allZombies.reduce((sum, z) => sum + (z.estimated_monthly_cost || 0), 0);
 
@@ -140,13 +155,13 @@ exports.runScan = async (req, res) => {
             zombies_found: insertedCount,
             estimated_monthly_savings_usd: parseFloat(totalSavings.toFixed(2)),
             breakdown: {
-                ebs_volumes: safeResult(unattachedVolumes, '').length,
-                elastic_ips: safeResult(idleIPs, '').length,
-                ec2_instances: safeResult(stoppedInstances, '').length,
-                ebs_snapshots: safeResult(oldSnapshots, '').length,
-                load_balancers: safeResult(idleLoadBalancers, '').length,
-                nat_gateways: safeResult(idleNatGateways, '').length,
-                security_groups: safeResult(unusedSecurityGroups, '').length,
+                ebs_volumes: allZombies.filter(z => z.resource_type === 'ebs_volume').length,
+                elastic_ips: allZombies.filter(z => z.resource_type === 'elastic_ip').length,
+                ec2_instances: allZombies.filter(z => z.resource_type === 'ec2_instance').length,
+                ebs_snapshots: allZombies.filter(z => z.resource_type === 'ebs_snapshot').length,
+                load_balancers: allZombies.filter(z => z.resource_type === 'load_balancer').length,
+                nat_gateways: allZombies.filter(z => z.resource_type === 'nat_gateway').length,
+                security_groups: allZombies.filter(z => z.resource_type === 'security_group').length,
             },
         });
 
