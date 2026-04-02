@@ -1,10 +1,35 @@
 require('dotenv').config();
+const dns = require('dns');
+
+// Force IPv4 globally for all Node.js networking (fixes ENETUNREACH on restricted IPv6)
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder('ipv4first');
+}
+
 const app = require('./app');
 const { startScheduler } = require('./services/scheduler');
 
-const PORT = process.env.PORT || 4000;
+// Debug process exit
+process.on('beforeExit', (code) => {
+  console.log(`⚠️ Process beforeExit event with code: ${code}`);
+});
+process.on('exit', (code) => {
+  console.log(`⚠️ Process exit event with code: ${code}`);
+});
+process.on('uncaughtException', (err) => {
+  console.error('🔥 UNCAUGHT EXCEPTION:', err);
+});
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('🔥 UNHANDLED REJECTION at:', promise, 'reason:', reason);
+});
 
+const PORT = process.env.PORT || 4000;
 const db = require('./config/db');
+
+// Keep-alive to prevent "clean exit" if event loop is empty
+const keepAlive = setInterval(() => {
+  // Just keeping the loop alive
+}, 1000 * 60 * 60); // 1 hour
 
 app.listen(PORT, async () => {
   console.log(`🟢 flux API running on port ${PORT}`);
