@@ -176,7 +176,19 @@ const sendScanReport = async (to, summary, zombies = []) => {
   const savingsFormatted = `$${Number(summary.estimated_monthly_savings_usd || 0).toFixed(2)}`;
   const subject = `⚡ Scan Report: ${summary.zombies_found || 0} zombie${summary.zombies_found !== 1 ? 's' : ''} found in ${summary.accountName || 'Your Account'} — ${savingsFormatted}/mo wasted`;
 
-  await queueEmail(to, subject, html);
+  try {
+    await transporter.sendMail({
+      from: process.env.SMTP_FROM || '"GreenOps Reaper" <noreply@greenops.io>',
+      to,
+      subject,
+      html,
+    });
+    console.log(`[EmailDirect] Sent report directly to ${to}`);
+  } catch (err) {
+    console.error(`[EmailDirect] Failed to send report to ${to}:`, err.message);
+    // Optional: Fallback to queue if direct fails?
+    // For now just error.
+  }
 };
 
 /**

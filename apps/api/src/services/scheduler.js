@@ -157,12 +157,7 @@ const startScheduler = async () => {
             await reloadSchedule(schedule);
         }
 
-        // Start Email Queue Processor (Runs every 1 minute)
-        cron.schedule('* * * * *', async () => {
-            await processEmailQueue();
-        }, { scheduled: true, timezone: 'UTC' });
-        console.log('[Scheduler] 📨 Email Queue Worker scheduled (every 1m).');
-
+        // (Direct email sending is now handled in emailService.sendScanReport)
     } catch (err) {
         console.error('❌ [Scheduler] Failed to start scheduler:', err.message);
     }
