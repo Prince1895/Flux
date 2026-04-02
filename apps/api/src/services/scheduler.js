@@ -161,10 +161,10 @@ const startScheduler = async () => {
         cron.schedule('* * * * *', async () => {
             await processEmailQueue();
         }, { scheduled: true, timezone: 'UTC' });
-        console.log('[Scheduler] Started local Email Queue Worker.');
+        console.log('[Scheduler] 📨 Email Queue Worker scheduled (every 1m).');
 
     } catch (err) {
-        console.error('[Scheduler] Failed to start scheduler:', err.message);
+        console.error('❌ [Scheduler] Failed to start scheduler:', err.message);
     }
 };
 
