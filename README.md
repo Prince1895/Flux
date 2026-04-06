@@ -1,168 +1,110 @@
-# Flux - Cut the Bloat, Keep the Scale.
+# GreenOps Reaper 🌬️
+### Cut the Bloat, Keep the Scale.
 
-# Database design
-![alt text](image.png)
+**GreenOps Reaper** (also known as **Flux**) is an automated cloud efficiency platform designed to identify, report, and "reap" idle or over-provisioned cloud resources. It helps organizations reduce their cloud bill and carbon footprint by ensuring every dollar spent on infrastructure provides actual value.
 
+![Database Design](image.png)
 
+## 🚀 Key Features
 
+*   **Zombie Resource Detection**: Automatically identifies "zombie" resources such as:
+    *   Unattached EBS volumes.
+    *   Idle EC2 instances with low CPU/Network utilization.
+    *   Unused Elastic Load Balancers (ELBs).
+    *   Dangling Elastic IPs.
+*   **Multi-Region Scanning**: Scan your AWS infrastructure across multiple regions simultaneously.
+*   **Automated Email Reports**: Receive periodic summaries of potential savings and identified waste directly in your inbox.
+*   **Secure Authentication**: Integrated with Google and GitHub OAuth for seamless, secure access.
+*   **Cost Estimation**: Get real-time estimates of how much each idle resource is costing you per month.
+*   **Actionable Insights**: A clear dashboard to manage your cloud accounts and take action on findings.
+*   **Multi-tenant Architecture**: Designed as a SaaS with subscription plans and scan credits.
 
+## 🛠️ Tech Stack
 
+*   **Monorepo Strategy**: Managed with [Turborepo](https://turbo.build/repo).
+*   **Frontend**: React (Vite) with a custom design system built on Vanilla CSS.
+*   **Backend**: Node.js & Express.
+*   **Database**: PostgreSQL hosted on [Neon](https://neon.tech/).
+*   **Cloud Integration**: AWS SDK v3 (EC2, CloudWatch, ELB, STS).
+*   **Authentication**: Passport.js (Google & GitHub Strategies).
+*   **Automation**: Node-Cron for scheduled infrastructure audits.
+*   **Mail**: Nodemailer for automated reporting.
 
+## 📦 Project Structure
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Turborepo starter
-
-This Turborepo starter is maintained by the Turborepo core team.
-
-## Using this example
-
-Run the following command:
-
-```sh
-npx create-turbo@latest
+```text
+.
+├── apps
+│   ├── api          # Express.js Backend
+│   └── web          # React (Vite) Frontend
+├── packages
+│   ├── ui           # Shared UI Component Library
+│   ├── eslint-config # Shared ESLint configurations
+│   └── typescript-config # Shared TSConfigs
+└── turbo.json       # Turborepo configuration
 ```
 
-## What's inside?
+## ⚙️ Getting Started
 
-This Turborepo includes the following packages/apps:
+### Prerequisites
 
-### Apps and Packages
+*   [Node.js](https://nodejs.org/) (v18+)
+*   [npm](https://www.npmjs.com/) or [pnpm](https://pnpm.io/)
+*   An [AWS Account](https://aws.amazon.com/) with a ReadOnlyAccess policy (or custom policy for reaping).
+*   A [Neon](https://neon.tech/) or PostgreSQL database.
 
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
+### Installation
 
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
+1.  **Clone the repository**:
+    ```bash
+    git clone https://github.com/Prince1895/Flux.git
+    cd greenops-reaper
+    ```
 
-### Utilities
+2.  **Install dependencies**:
+    ```bash
+    npm install
+    ```
 
-This Turborepo has some additional tools already setup for you:
+3.  **Environment Setup**:
+    Create a `.env` file in `apps/api/` with the following variables:
+    ```env
+    DATABASE_URL=your_postgres_connection_string
+    JWT_SECRET=your_jwt_secret
+    GOOGLE_CLIENT_ID=...
+    GOOGLE_CLIENT_SECRET=...
+    GITHUB_CLIENT_ID=...
+    GITHUB_CLIENT_SECRET=...
+    AWS_ACCESS_KEY_ID=...
+    AWS_SECRET_ACCESS_KEY=...
+    SMTP_HOST=...
+    SMTP_PORT=...
+    SMTP_USER=...
+    SMTP_PASS=...
+    FRONTEND_URL=http://localhost:5173
+    BACKEND_URL=http://localhost:4000
+    ```
 
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
+4.  **Database Migration**:
+    The schema is automatically applied on boot when running the API. You can also manually apply `apps/api/schema.sql`.
 
-### Build
+### Development
 
-To build all apps and packages, run the following command:
+Run all applications in development mode:
 
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
-```
-
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
+```bash
+npm run dev
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+The frontend will be available at `http://localhost:5173` and the API at `http://localhost:4000`.
 
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
+## 🚢 Deployment
 
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
+The project is optimized for deployment on **Vercel** or any Node.js compatible environment.
 
-### Remote Caching
+*   The `web` app is a static Vite build.
+*   The `api` app is a standard Node.js server.
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
+## 📜 License
 
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo login
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-```
-# With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended)
-turbo link
-
-# Without [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation), use your package manager
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+This project is licensed under the ISC License.
