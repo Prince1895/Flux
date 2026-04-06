@@ -1,4 +1,4 @@
-# GreenOps Reaper 🌬️
+# flux- Cloud Cost Optimization Engine 🌬️
 ### Cut the Bloat, Keep the Scale.
 
 **GreenOps Reaper** (also known as **Flux**) is an automated cloud efficiency platform designed to identify, report, and "reap" idle or over-provisioned cloud resources. It helps organizations reduce their cloud bill and carbon footprint by ensuring every dollar spent on infrastructure provides actual value.
